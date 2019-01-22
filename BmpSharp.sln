@@ -5,7 +5,19 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8A1FB634-C3EF-465F-8C06-9B70FC25C407}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BmpSharp", "src\BmpSharp\BmpSharp.csproj", "{A62DF8C7-5D15-4B22-80BA-CDEF721C6833}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BmpSharp", "src\BmpSharp\BmpSharp.csproj", "{A62DF8C7-5D15-4B22-80BA-CDEF721C6833}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0A456D5F-5396-480C-93D9-1DE0067270E2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BmpSharpNUnitTest", "tests\BmpSharpNUnitTest\BmpSharpNUnitTest.csproj", "{3A968A67-47E6-45B4-846F-B9608825E482}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{86F39545-23EC-42F9-9E27-8B840A4AB334}"
+	ProjectSection(SolutionItems) = preProject
+		images\cross_with_patterns.bmp = images\cross_with_patterns.bmp
+		images\horizontal_lines.bmp = images\horizontal_lines.bmp
+		images\rgb_ycm_black.bmp = images\rgb_ycm_black.bmp
+		images\vertical_lines.bmp = images\vertical_lines.bmp
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +27,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A62DF8C7-5D15-4B22-80BA-CDEF721C6833}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -32,8 +41,27 @@ Global
 		{A62DF8C7-5D15-4B22-80BA-CDEF721C6833}.Release|x64.Build.0 = Release|Any CPU
 		{A62DF8C7-5D15-4B22-80BA-CDEF721C6833}.Release|x86.ActiveCfg = Release|Any CPU
 		{A62DF8C7-5D15-4B22-80BA-CDEF721C6833}.Release|x86.Build.0 = Release|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Debug|x64.Build.0 = Debug|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Debug|x86.Build.0 = Debug|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Release|x64.ActiveCfg = Release|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Release|x64.Build.0 = Release|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Release|x86.ActiveCfg = Release|Any CPU
+		{3A968A67-47E6-45B4-846F-B9608825E482}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A62DF8C7-5D15-4B22-80BA-CDEF721C6833} = {8A1FB634-C3EF-465F-8C06-9B70FC25C407}
+		{3A968A67-47E6-45B4-846F-B9608825E482} = {0A456D5F-5396-480C-93D9-1DE0067270E2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B274EDBA-72AE-4416-B82A-05B81E4A0420}
 	EndGlobalSection
 EndGlobal
