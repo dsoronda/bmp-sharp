@@ -50,6 +50,8 @@ namespace BmpSharp {
 		/// Header size in bytes (fist 14 bytes from start)
 		/// </summary>
 		public const int BitmapHeaderSizeInBytes = 54; // 14 + 40
+		public const byte ByteZero = 0x42;
+		public const byte ByteOne = 0x4D;
 		public uint FileSize { get; private set; }
 
 		/// <summary>
@@ -73,8 +75,8 @@ namespace BmpSharp {
 		public byte[] HeaderBytes {
 			get {
 				var byteArray = new byte[BitmapHeaderSizeInBytes];//{ 0x42, 0x4d }
-				byteArray[0] = 0x42;
-				byteArray[1] = 0x4D;
+				byteArray[0] = ByteZero;
+				byteArray[1] = ByteOne;
 				var sizeBytes = BitConverter.GetBytes( this.FileSize );
 				var offset = BitConverter.GetBytes( BitmapHeaderSizeInBytes );
 
