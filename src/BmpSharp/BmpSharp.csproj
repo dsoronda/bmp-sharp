@@ -7,9 +7,10 @@
     <Authors>Dražen Šoronda ( dsoronda@gmail.com )</Authors>
     <Company>-</Company>
     <Product />
-    <PackageLicenseUrl>https://www.gnu.org/licenses/lgpl-3.0.en.html</PackageLicenseUrl>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/dsoronda/bmp-sharp</PackageProjectUrl>
-    <Description>Simple .NetStandard C# library for handling BMP files</Description>
+    <Description>Simple .NetStandard C# library for handling BMP files.
+The MIT License.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>bmp-sharp.pfx</AssemblyOriginatorKeyFile>
