@@ -2,6 +2,22 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <Authors>Dražen Šoronda ( dsoronda@gmail.com )</Authors>
+    <Company>-</Company>
+    <Product />
+    <PackageLicenseUrl>https://www.gnu.org/licenses/lgpl-3.0.en.html</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/dsoronda/bmp-sharp</PackageProjectUrl>
+    <Description>Simple .NetStandard C# library for handling BMP files</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>bmp-sharp.pfx</AssemblyOriginatorKeyFile>
+    <Copyright>Copyright (c) Dražen Šoronda</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
 </Project>
