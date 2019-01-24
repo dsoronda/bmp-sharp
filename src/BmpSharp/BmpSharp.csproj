@@ -7,7 +7,8 @@
     <Authors>Dražen Šoronda ( dsoronda@gmail.com )</Authors>
     <Company>-</Company>
     <Product />
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
+		<License>The MIT License</License>
     <PackageProjectUrl>https://github.com/dsoronda/bmp-sharp</PackageProjectUrl>
     <Description>Simple .NetStandard C# library for handling BMP files.
 The MIT License.</Description>
@@ -18,10 +19,21 @@ The MIT License.</Description>
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes />
     <PackageTags>BMP C# csharp core netstandard</PackageTags>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
+
+	<ItemGroup>
+    <None Include="LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>
