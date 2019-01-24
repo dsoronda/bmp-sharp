@@ -20,6 +20,7 @@ The MIT License.</Description>
     <PackageReleaseNotes />
     <PackageTags>BMP C# csharp core netstandard</PackageTags>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<Version>0.1.0</Version>
   </PropertyGroup>
 
 	<ItemGroup>
