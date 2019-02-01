@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using BmpSharp;
 using NUnit.Framework;
 
@@ -29,6 +30,38 @@ namespace Tests {
 
 			var bmpFileSize = System.BitConverter.ToUInt32( buffer, 2 );
 			Assert.AreEqual( bufferSize, bmpFileSize, "invalid BMP file size" );
+		}
+
+		[Test]
+		public void DataFliped__Success() {
+			// 2 rows , 3 pixels per row
+			var originalData = new byte[] {
+				0x00, 0xff ,0xff,	// red
+				0x00, 0xff ,0x00,	// green
+				0xff, 0x00, 0x00,	// blue
+				0xff, 0xff, 0xff,	// white
+				0x77, 0x76, 0x75,	// grayish
+				0x10, 0x11, 0x12,	// darkish
+			};
+
+			var flipedData = new byte[] {
+				0xff, 0xff, 0xff,	// white
+				0x77, 0x76, 0x75,	// grayish
+				0x10, 0x11, 0x12,	// darkish
+				0x00, 0xff ,0xff,	// red
+				0x00, 0xff ,0x00,	// green
+				0xff, 0x00, 0x00,	// blue
+			};
+
+			var bmp = new Bitmap( 3, 2, originalData );
+			var bufferSize = BitmapHeader.BitmapHeaderSizeInBytes + originalData.Length;
+
+			var buffer = bmp.GetBytes( flipped: true );
+
+			var bmpData = buffer.Skip( 54 ).Take( originalData.Length ).ToArray();
+			Assert.AreEqual( flipedData.Length, bmpData.Length );
+			Assert.AreEqual( flipedData, bmpData );
+
 		}
 	}
 }

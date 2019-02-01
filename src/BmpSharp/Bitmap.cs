@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -16,6 +17,7 @@ namespace BmpSharp {
 		public int Width { get; }
 		public int Height { get; }
 		public BitsPerPixelEnum BitsPerPixelEnum { get; }
+		public int BytesPerPixel => (int)BitsPerPixelEnum / 8;	
 		public byte[] PixelData { get; }
 		public BitmapHeader Header { get; }
 
@@ -27,11 +29,34 @@ namespace BmpSharp {
 			this.Header = new BitmapHeader( width, height, bitsPerPixel, (uint) pixelData.Length );
 		}
 
-		public byte[] GetBytes() {
-			var b = new byte[BitmapHeader.BitmapHeaderSizeInBytes + PixelData.Length];
-			Buffer.BlockCopy( this.Header.HeaderBytes, 0, b, 0, BitmapHeader.BitmapHeaderSizeInBytes );
-			Buffer.BlockCopy( this.PixelData, 0, b, BitmapHeader.BitmapHeaderSizeInBytes, PixelData.Length );
-			return b;
+		/// <summary>
+		/// Get bitmap as bytes for saving to file
+		/// </summary>
+		/// <param name="flipped">Flip rows</param>
+		/// <returns></returns>
+		public byte[] GetBytes( bool flipped = false ) {
+			var buffer = new byte[BitmapHeader.BitmapHeaderSizeInBytes + PixelData.Length];
+			Buffer.BlockCopy( this.Header.HeaderBytes, 0, buffer, 0, BitmapHeader.BitmapHeaderSizeInBytes );
+
+
+			if (flipped) {
+				var rowListData = new List<byte[]>();
+				var totalRows = Height;
+				var pixelsInRow = Width;
+
+				for (var row = totalRows-1; row >= 0; row--) {
+					byte[] one_row = PixelData.Skip( row * Width * BytesPerPixel).Take( Width * BytesPerPixel ).ToArray();
+					rowListData.Add( one_row );
+				}
+				var reversedBytes = rowListData.SelectMany( row => row ).ToArray();
+
+				Buffer.BlockCopy( reversedBytes, 0, buffer, BitmapHeader.BitmapHeaderSizeInBytes, PixelData.Length );
+
+			} else {
+
+				Buffer.BlockCopy( this.PixelData, 0, buffer, BitmapHeader.BitmapHeaderSizeInBytes, PixelData.Length );
+			}
+			return buffer;
 		}
 
 		public System.IO.Stream GetStream() {
