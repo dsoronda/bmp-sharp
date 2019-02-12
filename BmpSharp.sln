@@ -15,7 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{86F395
 	ProjectSection(SolutionItems) = preProject
 		images\cross_with_patterns.bmp = images\cross_with_patterns.bmp
 		images\horizontal_lines.bmp = images\horizontal_lines.bmp
-		images\rgb_ycm_black.bmp = images\rgb_ycm_black.bmp
+		images\rgb_ycm_colors.bmp = images\rgb_ycm_colors.bmp
+		images\rgb_ycm_colors_fliped.bmp = images\rgb_ycm_colors_fliped.bmp
 		images\vertical_lines.bmp = images\vertical_lines.bmp
 	EndProjectSection
 EndProject

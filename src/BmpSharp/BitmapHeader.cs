@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -18,7 +18,7 @@ namespace BmpSharp {
 		/// </summary>
 		private uint pixelDataOffset;
 
-		private BitmapInfoHeader infoHeader;
+		public BitmapInfoHeader infoHeader;
 
 		public BitmapHeader( int width = 1, int height = 1, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, uint sizeOfPixelDataInBytes = 0 ) {
 			//if (System.BitConverter.IsLittleEndian)
