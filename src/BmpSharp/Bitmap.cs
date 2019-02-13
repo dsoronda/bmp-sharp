@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace BmpSharp {
@@ -13,9 +14,21 @@ namespace BmpSharp {
 	}
 
 	public class Bitmap {
-		public int Width { get; }
-		public int Height { get; }
+		public int Width { get; } = 0;
+		public int Height { get; } = 0;
 		public BitsPerPixelEnum BitsPerPixelEnum { get; }
+		/// <summary>
+		/// BMP file must be aligned at 4 butes at the end of row
+		/// </summary>
+		/// <param name="BitsPerPixelEnum"></param>
+		/// <returns></returns>
+		public int BytesPerRow => RequiredBytesPerRow( Width, BitsPerPixelEnum );
+		public static int RequiredBytesPerRow( int width, BitsPerPixelEnum bitsPerPixel ) => (int) Math.Ceiling( (decimal) (width * (int) bitsPerPixel) / 32 ) * 4;
+
+		/// <summary>
+		/// NOTE: we don't care for images that are less than 24 bits
+		/// </summary>
+		/// <returns></returns>
 		public int BytesPerPixel => (int) BitsPerPixelEnum / 8;
 		public byte[] PixelData { get; }
 
@@ -31,7 +44,7 @@ namespace BmpSharp {
 				var totalRows = Height;
 				var pixelsInRow = Width;
 
-				for (var row = totalRows - 1; row >= 0; row--) {
+				for (var row = totalRows - 1 ; row >= 0 ; row--) {
 					// NOTE: this only works on images that are 8/24/32 bits per pixel
 					byte[] one_row = PixelData.Skip( row * Width * BytesPerPixel ).Take( Width * BytesPerPixel ).ToArray();
 					rowListData.Add( one_row );
@@ -40,6 +53,7 @@ namespace BmpSharp {
 				return reversedBytes;
 			}
 		}
+
 		public BitmapHeader Header { get; }
 
 		public Bitmap( int width, int height, byte[] pixelData, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24 ) {
@@ -47,30 +61,55 @@ namespace BmpSharp {
 			this.Height = height;
 			this.PixelData = pixelData ?? throw new ArgumentNullException( nameof( pixelData ) );
 			this.BitsPerPixelEnum = bitsPerPixel;
-			this.Header = new BitmapHeader( width, height, bitsPerPixel, (uint) pixelData.Length );
+			var rawImageSize = BytesPerRow * height;
+			this.Header = new BitmapHeader( width, height, bitsPerPixel, rawImageSize );
 		}
 
 		/// <summary>
-		/// Get bitmap as bytes for saving to file
+		/// Get bitmap as byte aray for saving to file
 		/// </summary>
 		/// <param name="flipped">Flip (reverse order of) rows. Bitmap pixel rows are stored from bottom to up as shown in image</param>
 		/// <returns></returns>
-		public byte[] GetBytes( bool flipped = false ) {
-			var buffer = new byte[BitmapHeader.BitmapHeaderSizeInBytes + PixelData.Length];
-			Buffer.BlockCopy( this.Header.HeaderBytes, 0, buffer, 0, BitmapHeader.BitmapHeaderSizeInBytes );
+		public byte[] GenerateBmpBytes( bool flipped = false ) {
+			//var rawImageSize = BytesPerRow * Height;
+			//var buffer = new byte[BitmapHeader.BitmapHeaderSizeInBytes + rawImageSize];
+			//Buffer.BlockCopy( this.Header.HeaderBytes, 0, buffer, 0, BitmapHeader.BitmapHeaderSizeInBytes );
 
-			if (flipped) {
-				Buffer.BlockCopy( this.PixelDataFliped, 0, buffer, BitmapHeader.BitmapHeaderSizeInBytes, PixelData.Length );
-			} else {
-				Buffer.BlockCopy( this.PixelData, 0, buffer, BitmapHeader.BitmapHeaderSizeInBytes, PixelData.Length );
+			//if (flipped) {
+			//	Buffer.BlockCopy( this.PixelDataFliped, 0, buffer, BitmapHeader.BitmapHeaderSizeInBytes, PixelData.Length );
+			//} else {
+			//	Buffer.BlockCopy( this.PixelData, 0, buffer, BitmapHeader.BitmapHeaderSizeInBytes, PixelData.Length );
+			//}
+			//return buffer;
+
+			using (var stream = GetStream( flipped )) {
+				return stream.ToArray();
 			}
-			return buffer;
 		}
 
-		public System.IO.Stream GetStream( bool fliped = false ) {
-			var stream = new System.IO.MemoryStream( BitmapHeader.BitmapHeaderSizeInBytes + PixelData.Length );
-			var bytes = GetBytes( fliped );
-			stream.Write( bytes, 0, bytes.Length );
+		public MemoryStream GetStream( bool fliped = false ) {
+			var rawImageSize = BytesPerRow * Height;
+
+			//var stream = new System.IO.MemoryStream( BitmapHeader.BitmapHeaderSizeInBytes + (int) rawImageSize );
+			var stream = new MemoryStream( rawImageSize );
+			using (var writer = new BinaryWriter( stream )) {
+				writer.Write( this.Header.HeaderBytes );
+				writer.Flush();
+				stream.Flush();
+				var paddingRequired = BytesPerRow != (Width * BytesPerPixel);
+				var bytesToCopy = Width * BytesPerPixel;
+				var pixData = fliped ? PixelDataFliped : PixelData;
+
+				if (paddingRequired) {
+					for (var counter = 0 ; counter < Height ; counter++) {
+						var rowBuffer = new byte[this.BytesPerRow];
+						Buffer.BlockCopy( src: pixData, srcOffset: counter * bytesToCopy, dst: rowBuffer, dstOffset: 0, count: bytesToCopy );
+						writer.Write( rowBuffer );
+					}
+				} else {
+					writer.Write( pixData );
+				}
+			}
 			stream.Position = 0;
 			return stream;
 		}

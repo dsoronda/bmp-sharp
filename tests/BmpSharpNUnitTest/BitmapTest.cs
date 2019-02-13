@@ -29,7 +29,7 @@ namespace Tests {
 				Array.Reverse( buffer, 2, sizeof( uint ) );
 
 			var bmpFileSize = System.BitConverter.ToUInt32( buffer, 2 );
-			Assert.AreEqual( bufferSize, bmpFileSize, "invalid BMP file size" );
+			Assert.AreEqual( bufferSize, bmpFileSize, "invalid BMP file headerSize" );
 		}
 
 		[Test]
@@ -60,7 +60,7 @@ namespace Tests {
 			var bmp = new Bitmap( 3, 2, originalData );
 			var bufferSize = BitmapHeader.BitmapHeaderSizeInBytes + originalData.Length;
 
-			var buffer = bmp.GetBytes( flipped: true );
+			var buffer = bmp.GenerateBmpBytes( flipped: true );
 
 			var bmpData = buffer.Skip( 54 ).Take( originalData.Length ).ToArray();
 			Assert.AreEqual( flipedData.Length, bmpData.Length );

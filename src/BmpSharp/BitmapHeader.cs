@@ -6,7 +6,7 @@ namespace BmpSharp {
 	[StructLayout( LayoutKind.Sequential, Pack = 1 )]
 	public class BitmapHeader {
 		/// <summary>
-		/// Header size in bytes (fist 14 bytes from start)
+		/// Header headerSize in bytes (fist 14 bytes from start)
 		/// </summary>
 		public const int BitmapHeaderSizeInBytes = 54; // 14 + 40
 		public const byte ByteZero = 0x42;
@@ -20,15 +20,15 @@ namespace BmpSharp {
 
 		public BitmapInfoHeader infoHeader;
 
-		public BitmapHeader( int width = 1, int height = 1, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, uint sizeOfPixelDataInBytes = 0 ) {
+		public BitmapHeader( int width = 1, int height = 1, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, int rawImageSize = 0 ) {
 			//if (System.BitConverter.IsLittleEndian)
 
 			//fileSize = (uint)(width * height * (int)bitsPerPixel) / 8;
-			FileSize = BitmapHeaderSizeInBytes + sizeOfPixelDataInBytes;
+			FileSize = (uint) ( BitmapHeaderSizeInBytes + rawImageSize );
 
 			pixelDataOffset = BitmapHeaderSizeInBytes + (uint) BitmapInfoHeader.SizeInBytes;
 
-			infoHeader = new BitmapInfoHeader( width, height, bitsPerPixel: bitsPerPixel );
+			infoHeader = new BitmapInfoHeader( width, height, bitsPerPixel: bitsPerPixel, rawImageSize: rawImageSize );
 		}
 
 		public byte[] HeaderBytes {
@@ -46,7 +46,7 @@ namespace BmpSharp {
 					Array.Reverse( offset );
 				}
 				// everything is ok
-				sizeBytes.CopyTo( byteArray, 2 );//02 	2 	4 bytes 	The size of the BMP file in bytes
+				sizeBytes.CopyTo( byteArray, 2 );//02 	2 	4 bytes 	The headerSize of the BMP file in bytes
 				offset.CopyTo( byteArray, 10 );//0A 	10 	4 bytes 	The offset, i.e. starting address, of the byte where the bitmap image data (pixel array) can be found.
 
 				var infoHeaderBytes = this.infoHeader.HeaderInfoBytes;
@@ -61,7 +61,7 @@ namespace BmpSharp {
 			if (headerBytes == null)
 				throw new ArgumentNullException( nameof( headerBytes ) );
 			if (headerBytes.Length != BitmapHeader.BitmapHeaderSizeInBytes)
-				throw new ArgumentOutOfRangeException( $"{nameof( headerBytes )} should be {BitmapHeader.BitmapHeaderSizeInBytes} bytes in size" );
+				throw new ArgumentOutOfRangeException( $"{nameof( headerBytes )} should be {BitmapHeader.BitmapHeaderSizeInBytes} bytes in headerSize" );
 
 			//var width = BitConverter.ToUInt32(headerBytes, 2);
 

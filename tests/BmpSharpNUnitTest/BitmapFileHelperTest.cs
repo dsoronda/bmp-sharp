@@ -1,9 +1,11 @@
+using System;
 using System.IO;
+using System.Threading.Tasks;
 using BmpSharp;
 using NUnit.Framework;
 
 namespace Tests {
-	public class BitmapFileReaderTest {
+	public class BitmapFileHelperTest {
 		public static readonly string TestFileName = "rgb_ycm_colors.bmp";
 
 		public static readonly string ImagesFolder = @"..\..\..\..\..\images\";
@@ -19,15 +21,29 @@ namespace Tests {
 
 		[Test]
 		public void ReadFileAsBitmap_Success() {
-			var bitmap = BitmapFileReader.ReadFileAsBitmap( TestImageFullPath );
+			Bitmap bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
 			Assert.NotNull( bitmap );
 
 			Assert.AreEqual( 10, bitmap.Width );
 			Assert.AreEqual( 2, bitmap.Height );
 			Assert.AreEqual( 3, bitmap.BytesPerPixel );
 			Assert.AreEqual( 10 * 2 * 3, bitmap.PixelData.Length );
+			Assert.AreEqual( BitsPerPixelEnum.RGB24, bitmap.BitsPerPixelEnum);
+			
 
 			//Assert.Fail("not implemented");
+		}
+
+		[Test]
+		public async Task WriteFileAsBitmap_Success() {
+			Bitmap bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
+			var tempFolder = System.IO.Path.GetTempPath();
+			var targetFile = Path.Combine( tempFolder, TestFileName );
+			await BitmapFileHelper.SaveBitmapToFile( targetFile, bitmap );
+
+			Assert.IsTrue(File.Exists(targetFile));
+			var fileInfo = new FileInfo(targetFile);
+			Assert.AreEqual(bitmap.GenerateBmpBytes().Length, fileInfo.Length);
 		}
 	}
 }
