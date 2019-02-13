@@ -23,7 +23,7 @@ namespace BmpSharp {
 		/// <param name="BitsPerPixelEnum"></param>
 		/// <returns></returns>
 		public int BytesPerRow => RequiredBytesPerRow( Width, BitsPerPixelEnum );
-		public static int RequiredBytesPerRow( int width, BitsPerPixelEnum bitsPerPixel ) => (int) Math.Ceiling( (decimal) (width * (int) bitsPerPixel) / 32 ) * 4;
+		public static int RequiredBytesPerRow( int width, BitsPerPixelEnum bitsPerPixel ) => (int) Math.Ceiling( (decimal) ( width * (int) bitsPerPixel ) / 32 ) * 4;
 
 		/// <summary>
 		/// NOTE: we don't care for images that are less than 24 bits
@@ -44,7 +44,7 @@ namespace BmpSharp {
 				var totalRows = Height;
 				var pixelsInRow = Width;
 
-				for (var row = totalRows - 1 ; row >= 0 ; row--) {
+				for (var row = totalRows - 1; row >= 0; row--) {
 					// NOTE: this only works on images that are 8/24/32 bits per pixel
 					byte[] one_row = PixelData.Skip( row * Width * BytesPerPixel ).Take( Width * BytesPerPixel ).ToArray();
 					rowListData.Add( one_row );
@@ -92,25 +92,27 @@ namespace BmpSharp {
 
 			//var stream = new System.IO.MemoryStream( BitmapHeader.BitmapHeaderSizeInBytes + (int) rawImageSize );
 			var stream = new MemoryStream( rawImageSize );
-			using (var writer = new BinaryWriter( stream )) {
-				writer.Write( this.Header.HeaderBytes );
-				writer.Flush();
-				stream.Flush();
-				var paddingRequired = BytesPerRow != (Width * BytesPerPixel);
-				var bytesToCopy = Width * BytesPerPixel;
-				var pixData = fliped ? PixelDataFliped : PixelData;
 
-				if (paddingRequired) {
-					for (var counter = 0 ; counter < Height ; counter++) {
-						var rowBuffer = new byte[this.BytesPerRow];
-						Buffer.BlockCopy( src: pixData, srcOffset: counter * bytesToCopy, dst: rowBuffer, dstOffset: 0, count: bytesToCopy );
-						writer.Write( rowBuffer );
-					}
-				} else {
-					writer.Write( pixData );
+			//using (var writer = new BinaryWriter( stream )) {
+			var writer = new BinaryWriter( stream );
+			writer.Write( this.Header.HeaderBytes );
+			writer.Flush();
+			stream.Flush();
+			var paddingRequired = BytesPerRow != ( Width * BytesPerPixel );
+			var bytesToCopy = Width * BytesPerPixel;
+			var pixData = fliped ? PixelDataFliped : PixelData;
+
+			if (paddingRequired) {
+				for (var counter = 0; counter < Height; counter++) {
+					var rowBuffer = new byte[this.BytesPerRow];
+					Buffer.BlockCopy( src: pixData, srcOffset: counter * bytesToCopy, dst: rowBuffer, dstOffset: 0, count: bytesToCopy );
+					writer.Write( rowBuffer );
 				}
+			} else {
+				writer.Write( pixData );
 			}
 			stream.Position = 0;
+
 			return stream;
 		}
 	}
