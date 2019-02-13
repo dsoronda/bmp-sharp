@@ -14,7 +14,7 @@ namespace Tests {
 
 			var data = new byte[] { 127, 64, 192 };
 			var bmp = new Bitmap( 1, 1, data );
-			var bufferSize = BitmapHeader.BitmapHeaderSizeInBytes + data.Length;
+			var bufferSize = BitmapHeader.BitmapHeaderSizeInBytes + bmp.BytesPerRow;
 
 			var buffer = new byte[bufferSize];
 			using (var memoryStream = bmp.GetStream()) {
@@ -58,13 +58,9 @@ namespace Tests {
 			};
 
 			var bmp = new Bitmap( 3, 2, originalData );
-			var bufferSize = BitmapHeader.BitmapHeaderSizeInBytes + originalData.Length;
 
-			var buffer = bmp.GenerateBmpBytes( flipped: true );
-
-			var bmpData = buffer.Skip( 54 ).Take( originalData.Length ).ToArray();
-			Assert.AreEqual( flipedData.Length, bmpData.Length );
-			Assert.AreEqual( flipedData, bmpData );
+			Assert.AreEqual( flipedData.Length, bmp.PixelDataFliped.Length );
+			Assert.AreEqual( flipedData, bmp.PixelDataFliped);
 
 		}
 	}

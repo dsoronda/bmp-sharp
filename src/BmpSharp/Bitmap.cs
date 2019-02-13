@@ -38,7 +38,7 @@ namespace BmpSharp {
 		/// So first row in bitmap file is lowest row in Image.
 		/// </summary>
 		/// <returns>Pixel data with reversed (fliped) rows</returns>
-		private byte[] PixelDataFliped {
+		public byte[] PixelDataFliped {
 			get {
 				var rowListData = new List<byte[]>();
 				var totalRows = Height;
