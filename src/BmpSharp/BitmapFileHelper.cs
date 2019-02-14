@@ -2,7 +2,7 @@ using System;
 using System.IO;
 
 namespace BmpSharp {
-	public class BitmapFileHelper {
+	public static class BitmapFileHelper {
 		public static Bitmap ReadFileAsBitmap( string fileName, bool flipRows = false ) {
 			if (string.IsNullOrWhiteSpace( fileName ))
 				throw new ArgumentNullException( nameof( fileName ) );
@@ -29,10 +29,10 @@ namespace BmpSharp {
 					var bytesPerRow = Bitmap.RequiredBytesPerRow( infoHeader.width, (BitsPerPixelEnum) infoHeader.bitsPerPixel );
 
 					var bytesPerPixel = infoHeader.bitsPerPixel / 8;
-					var paddingRequired = IsPaddingRequired( infoHeader.width, (BitsPerPixelEnum) infoHeader.bitsPerPixel,
+					var paddingRequired = Bitmap.IsPaddingRequired( infoHeader.width, (BitsPerPixelEnum) infoHeader.bitsPerPixel,
 					bytesPerRow );
 
-					byte[] pixelData = new byte[width * height * bytesPerPixel];
+					var pixelData = new byte[width * height * bytesPerPixel];
 
 					if (paddingRequired) {
 						var bytesToCopy = width * bytesPerPixel;
@@ -53,11 +53,6 @@ namespace BmpSharp {
 			}
 		}
 
-		public static bool IsPaddingRequired( int width, BitsPerPixelEnum bitsPerPixel, int bytesPerRow ) {
-			//var bytesPerRow = Bitmap.RequiredBytesPerRow( width, bitsPerPixel );
-			return bytesPerRow != width * (int) bitsPerPixel / 8;
-		}
-
 		public static void SaveBitmapToFile( string fileName, Bitmap bitmap ) {
 			if (bitmap == null)
 				throw new ArgumentNullException( nameof( bitmap ) );
@@ -68,7 +63,7 @@ namespace BmpSharp {
 				throw new Exception( $"Destination directory not found." );
 
 			using (var fileStream = File.Create( fileName )) {
-				using (MemoryStream bmpStream = bitmap.GetStream()) {
+				using (var bmpStream = bitmap.GetStream()) {
 					  bmpStream.CopyTo( fileStream, bufferSize: 16 * 1024 );
 				}
 			}

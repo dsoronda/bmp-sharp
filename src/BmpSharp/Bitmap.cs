@@ -23,7 +23,7 @@ namespace BmpSharp {
 		/// <param name="BitsPerPixelEnum"></param>
 		/// <returns></returns>
 		public int BytesPerRow => RequiredBytesPerRow( Width, BitsPerPixelEnum );
-		public static int RequiredBytesPerRow( int width, BitsPerPixelEnum bitsPerPixel ) => (int) Math.Ceiling( (decimal) ( width * (int) bitsPerPixel ) / 32 ) * 4;
+	
 
 		/// <summary>
 		/// NOTE: we don't care for images that are less than 24 bits
@@ -115,5 +115,24 @@ namespace BmpSharp {
 
 			return stream;
 		}
+
+		/// <summary>
+		/// BMP file must be aligned at 4 butes at the end of row
+		/// </summary>
+		/// <param name="width">Image width</param>
+		/// <param name="bitsPerPixel">Bits per pixel</param>
+		/// <returns>How many bytes BMP requires per row</returns>
+		public static int RequiredBytesPerRow( int width, BitsPerPixelEnum bitsPerPixel ) => (int) Math.Ceiling( (decimal) ( width * (int) bitsPerPixel ) / 32 ) * 4;
+
+		/// <summary>
+		/// Check if padding is required (extra bytes for a row).
+		/// </summary>
+		/// <param name="width">Width of image</param>
+		/// <param name="bitsPerPixel">Bits per pixels to calculate actual byte requirement</param>
+		/// <param name="bytesPerRow">BMP required bytes per row</param>
+		/// <returns>True/false if we need to allocate extra bytes (for BMP savign) for padding</returns>
+		public static bool IsPaddingRequired( int width, BitsPerPixelEnum bitsPerPixel, int bytesPerRow ) =>
+			bytesPerRow != width * (int) bitsPerPixel / 8;
+
 	}
 }
