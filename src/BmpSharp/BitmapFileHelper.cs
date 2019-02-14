@@ -16,7 +16,7 @@ namespace BmpSharp {
 			using (var fileStream = File.OpenRead( fileName )) {
 				using (var bReader = new BinaryReader( fileStream )) {
 					var headerBytes = bReader.ReadBytes( BitmapHeader.BitmapHeaderSizeInBytes );
-					var header = BitmapHeader.GetHeaderFromBytes( headerBytes );
+					BitmapHeader header = BitmapHeader.GetHeaderFromBytes( headerBytes );
 
 					if (fileInfo.Length < header.FileSize)
 						throw new Exception( $"File headerSize [{fileInfo.Length}] is smaller than expected [{header.FileSize}]." );
@@ -25,7 +25,6 @@ namespace BmpSharp {
 					var width = infoHeader.width;
 					var height = infoHeader.height;
 
-
 					var bytesPerRow = Bitmap.RequiredBytesPerRow( infoHeader.width, (BitsPerPixelEnum) infoHeader.bitsPerPixel );
 
 					var bytesPerPixel = infoHeader.bitsPerPixel / 8;
@@ -33,6 +32,8 @@ namespace BmpSharp {
 					bytesPerRow );
 
 					var pixelData = new byte[width * height * bytesPerPixel];
+					// seek to location where pixel data is
+					fileStream.Seek(header.pixelDataOffset, SeekOrigin.Begin);
 
 					if (paddingRequired) {
 						var bytesToCopy = width * bytesPerPixel;
@@ -40,6 +41,8 @@ namespace BmpSharp {
 							var rowBuffer = bReader.ReadBytes( bytesPerRow );
 							Buffer.BlockCopy( src: rowBuffer, srcOffset: 0, dst: pixelData, dstOffset: counter * bytesToCopy, count: bytesToCopy );
 						}
+					} else {
+
 					}
 
 					var bitmap = new Bitmap(

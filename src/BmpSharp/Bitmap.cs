@@ -17,6 +17,7 @@ namespace BmpSharp {
 		public int Width { get; } = 0;
 		public int Height { get; } = 0;
 		public BitsPerPixelEnum BitsPerPixelEnum { get; }
+
 		/// <summary>
 		/// BMP file must be aligned at 4 butes at the end of row
 		/// </summary>
@@ -24,7 +25,6 @@ namespace BmpSharp {
 		/// <returns></returns>
 		public int BytesPerRow => RequiredBytesPerRow( Width, BitsPerPixelEnum );
 	
-
 		/// <summary>
 		/// NOTE: we don't care for images that are less than 24 bits
 		/// </summary>
@@ -98,6 +98,9 @@ namespace BmpSharp {
 			writer.Write( this.Header.HeaderBytes );
 			writer.Flush();
 			stream.Flush();
+
+			// TODO : write info Header bytes !!!
+
 			var paddingRequired = BytesPerRow != ( Width * BytesPerPixel );
 			var bytesToCopy = Width * BytesPerPixel;
 			var pixData = fliped ? PixelDataFliped : PixelData;

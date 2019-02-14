@@ -8,7 +8,7 @@ namespace BmpSharp {
 		// Warning CS0414  The field 'BitmapInfoHeader.horizontalPixelPerMeter' is assigned but its value is never used
 		// disable error warning , we dont need values in those fields !!
 #pragma warning disable CS0414
-		public readonly uint headerSize;
+		public readonly uint bitmapInfoHeaderSize;
 
 		/// <summary>
 		/// the bitmap width in pixels (signed integer)
@@ -36,7 +36,7 @@ namespace BmpSharp {
 		public readonly uint compressionMethod;
 
 		/// <summary>
-		/// the image size. This is the size of the raw bitmap data; a dummy 0 can be given for BI_RGB bitmaps. 
+		/// the image size. This is the size of the raw bitmap data; a dummy 0 can be given for BI_RGB bitmaps.
 		/// </summary>
 		public readonly int imageSize;
 
@@ -59,7 +59,7 @@ namespace BmpSharp {
 #pragma warning restore CS0414
 
 		public BitmapInfoHeader( int width, int height, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, int rawImageSize = 0 ) {
-			headerSize = SizeInBytes;
+			bitmapInfoHeaderSize = SizeInBytes;
 			this.width = width;
 			this.height = height;
 			colorPlanes = 1;
