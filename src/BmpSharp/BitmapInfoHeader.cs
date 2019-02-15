@@ -14,12 +14,12 @@ namespace BmpSharp {
 		/// <summary>
 		/// the bitmap Width in pixels (signed integer)
 		/// </summary>
-		public int Width;
+		public int Width { get; protected set; }
 
 		/// <summary>
 		/// the bitmap Height in pixels (signed integer)
 		/// </summary>
-		public int Height;
+		public int Height { get; protected set; }
 
 		/// <summary>
 		/// the number of color planes (must be 1)
@@ -29,27 +29,27 @@ namespace BmpSharp {
 		/// <summary>
 		/// the number of bits per pixel, which is the color depth of the image. Typical values are 1, 4, 8, 16, 24 and 32.
 		/// </summary>
-		public BitsPerPixelEnum BitsPerPixel;
+		public BitsPerPixelEnum BitsPerPixel { get; protected set; }
 
 		/// <summary>
 		/// 0 	BI_RGB (UNCOMPRESSED)
 		/// </summary>
-		public CompressionMethod CompressionMethod = CompressionMethod.BI_RGB;
+		public CompressionMethod CompressionMethod { get; protected set; } = CompressionMethod.BI_RGB;
 
 		/// <summary>
 		/// the image size. This is the size of the raw bitmap data; a dummy 0 can be given for BI_RGB bitmaps.
 		/// </summary>
-		public int ImageSize;
+		public int ImageSize { get; protected set; }
 
 		/// <summary>
 		/// the horizontal resolution of the image. (pixel per metre, signed integer)
 		/// </summary>
-		public int HorizontalPixelPerMeter;
+		public int HorizontalPixelPerMeter { get; protected set; }
 
 		/// <summary>
 		/// the vertical resolution of the image. (pixel per metre, signed integer)
 		/// </summary>
-		public int VerticalPixelPerMeter;
+		public int VerticalPixelPerMeter { get; protected set; }
 
 		/// <summary>
 		/// the number of colors in the color palette, or 0 to default to 2n (not used)

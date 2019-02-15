@@ -19,19 +19,25 @@ namespace BmpSharp {
 		base(width,height, bitsPerPixel,rawImageSize,horizontalPixelPerMeter,verticalPixelPerMeter,compressionMethod)
 		{
 			this.Width = width;
-			this.Height = height;
+			//this.Height = height;
 
-			this.BitsPerPixel = bitsPerPixel;
-			this.CompressionMethod = (uint) CompressionMethod.BI_RGB;
-			this.ImageSize = rawImageSize;
-			this.HorizontalPixelPerMeter = horizontalPixelPerMeter; // 96 DPI
-			this.VerticalPixelPerMeter = verticalPixelPerMeter;   // 96 DPI
+			//this.BitsPerPixel = bitsPerPixel;
+			//this.CompressionMethod = (uint) CompressionMethod.BI_RGB;
+			//this.ImageSize = rawImageSize;
+			//this.HorizontalPixelPerMeter = horizontalPixelPerMeter; // 96 DPI
+			//this.VerticalPixelPerMeter = verticalPixelPerMeter;   // 96 DPI
 		}
 
 		//public static int SizeInBytes => System.Runtime.InteropServices.Marshal.SizeOf(typeof(BitmapInfoHeader));
 		public static int SizeInBytes => 56;
 
-		public new byte[] HeaderInfoBytes => BinarySerializationExtensions.Serialize<BitmapInfoHeaderRGBA>( this );
+		public new byte[] HeaderInfoBytes //=> BinarySerializationExtensions.Serialize<BitmapInfoHeaderRGBA>( this );
+		{
+			get {
+				throw new NotImplementedException();
+				//return BinarySerializationExtensions.Serialize<BitmapInfoHeader>( this );
+			}
+		}
 
 		public new static BitmapInfoHeaderRGBA GetHeaderFromBytes( byte[] bytes ) {
 

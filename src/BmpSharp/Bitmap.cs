@@ -37,7 +37,7 @@ namespace BmpSharp {
 		/// <param name="BitsPerPixelEnum"></param>
 		/// <returns></returns>
 		public int BytesPerRow => RequiredBytesPerRow( Width, BitsPerPixelEnum );
-	
+
 		/// <summary>
 		/// NOTE: we don't care for images that are less than 24 bits
 		/// </summary>
@@ -78,9 +78,9 @@ namespace BmpSharp {
 			var rawImageSize = BytesPerRow * height;
 			this.FileHeader = new BitmapFileHeader( width, height, bitsPerPixel, rawImageSize );
 			if (bitsPerPixel == BitsPerPixelEnum.RGB24)
-				this.InfoHeaderBytes = ( new BitmapInfoHeader( width, height, bitsPerPixel ) ).HeaderInfoBytes;
+				this.InfoHeaderBytes = new BitmapInfoHeader( width, height, bitsPerPixel ).HeaderInfoBytes;
 			if (bitsPerPixel == BitsPerPixelEnum.RGBA32)
-				this.InfoHeaderBytes = ( new BitmapInfoHeaderRGBA( width, height, bitsPerPixel ) ).HeaderInfoBytes;
+				this.InfoHeaderBytes = new BitmapInfoHeaderRGBA( width, height, bitsPerPixel ).HeaderInfoBytes;
 		}
 
 		/// <summary>
@@ -114,7 +114,7 @@ namespace BmpSharp {
 			//using (var writer = new BinaryWriter( stream )) {
 			var writer = new BinaryWriter( stream );
 			writer.Write( this.FileHeader.HeaderBytes );
-			writer.Write( this.InfoHeaderBytes);
+			writer.Write( this.InfoHeaderBytes );
 			writer.Flush();
 			stream.Flush();
 
