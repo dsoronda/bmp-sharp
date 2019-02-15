@@ -26,18 +26,18 @@ namespace BmpSharp {
 
 					var infoHeader = BitmapInfoHeader.GetHeaderFromBytes( bReader.ReadBytes( dibHeaderSize ) );
 
-					var width = infoHeader.width;
-					var height = infoHeader.height;
+					var width = infoHeader.Width;
+					var height = infoHeader.Height;
 
-					var bytesPerRow = Bitmap.RequiredBytesPerRow( infoHeader.width, (BitsPerPixelEnum) infoHeader.bitsPerPixel );
+					var bytesPerRow = Bitmap.RequiredBytesPerRow( infoHeader.Width, infoHeader.BitsPerPixel );
 
-					var bytesPerPixel = infoHeader.bitsPerPixel / 8;
-					var paddingRequired = Bitmap.IsPaddingRequired( infoHeader.width, (BitsPerPixelEnum) infoHeader.bitsPerPixel,
+					var bytesPerPixel = (int) infoHeader.BitsPerPixel / 8;
+					var paddingRequired = Bitmap.IsPaddingRequired( infoHeader.Width, infoHeader.BitsPerPixel,
 					bytesPerRow );
 
 					var pixelData = new byte[width * height * bytesPerPixel];
 					// seek to location where pixel data is
-					fileStream.Seek(fileHeader.pixelDataOffset, SeekOrigin.Begin);
+					fileStream.Seek( fileHeader.pixelDataOffset, SeekOrigin.Begin );
 
 					if (paddingRequired) {
 						var bytesToCopy = width * bytesPerPixel;
@@ -52,7 +52,7 @@ namespace BmpSharp {
 					var bitmap = new Bitmap(
 						width, height,
 						pixelData: pixelData,
-						bitsPerPixel: (BitsPerPixelEnum) infoHeader.bitsPerPixel
+						bitsPerPixel: infoHeader.BitsPerPixel
 						);
 					return bitmap;
 
@@ -71,7 +71,7 @@ namespace BmpSharp {
 
 			using (var fileStream = File.Create( fileName )) {
 				using (var bmpStream = bitmap.GetStream()) {
-					  bmpStream.CopyTo( fileStream, bufferSize: 16 * 1024 );
+					bmpStream.CopyTo( fileStream, bufferSize: 16 * 1024 );
 				}
 			}
 		}

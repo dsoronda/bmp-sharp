@@ -140,7 +140,7 @@ namespace BmpSharp {
 		/// <summary>
 		/// BMP file must be aligned at 4 butes at the end of row
 		/// </summary>
-		/// <param name="width">Image width</param>
+		/// <param name="width">Image Width</param>
 		/// <param name="bitsPerPixel">Bits per pixel</param>
 		/// <returns>How many bytes BMP requires per row</returns>
 		public static int RequiredBytesPerRow( int width, BitsPerPixelEnum bitsPerPixel ) => (int) Math.Ceiling( (decimal) ( width * (int) bitsPerPixel ) / 32 ) * 4;

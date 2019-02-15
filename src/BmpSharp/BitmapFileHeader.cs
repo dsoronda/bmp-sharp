@@ -38,12 +38,12 @@ namespace BmpSharp {
 		public BitmapFileHeader( int width = 1, int height = 1, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, int rawImageSize = 0 ) {
 			//if (System.BitConverter.IsLittleEndian)
 
-			//fileSize = (uint)(width * height * (int)bitsPerPixel) / 8;
+			//fileSize = (uint)(Width * Height * (int)BitsPerPixel) / 8;
 			FileSize = (uint) ( BitmapFileHeader.BitmapFileHeaderSizeInBytes + BitmapInfoHeader.SizeInBytes + rawImageSize);
 
 			pixelDataOffset = BitmapFileHeader.BitmapFileHeaderSizeInBytes + (uint) BitmapInfoHeader.SizeInBytes;
 
-			//infoHeader = new BitmapInfoHeader( width, height, bitsPerPixel: bitsPerPixel, rawImageSize: rawImageSize );
+			//infoHeader = new BitmapInfoHeader( Width, Height, BitsPerPixel: BitsPerPixel, rawImageSize: rawImageSize );
 		}
 
 		public byte[] HeaderBytes {
@@ -79,7 +79,7 @@ namespace BmpSharp {
 			if (headerBytes.Length != BitmapFileHeader.BitmapFileHeaderSizeInBytes)
 				throw new ArgumentOutOfRangeException( $"{nameof( headerBytes )} should be {BitmapFileHeader.BitmapFileHeaderSizeInBytes} bytes in headerSize" );
 
-			//var width = BitConverter.ToUInt32(headerBytes, 2);
+			//var Width = BitConverter.ToUInt32(headerBytes, 2);
 
 			if (!System.BitConverter.IsLittleEndian) {
 				Array.Reverse( headerBytes, 2, 4 );
