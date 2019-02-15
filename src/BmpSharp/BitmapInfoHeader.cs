@@ -9,7 +9,7 @@ namespace BmpSharp {
 		// Warning CS0414  The field 'BitmapInfoHeader.HorizontalPixelPerMeter' is assigned but its value is never used
 		// disable error warning , we dont need values in those fields !!
 #pragma warning disable CS0414
-		//public readonly uint BitmapInfoHeaderSize;
+		public uint BitmapInfoHeaderSize { get; protected set; }
 
 		/// <summary>
 		/// the bitmap Width in pixels (signed integer)
@@ -82,13 +82,66 @@ namespace BmpSharp {
 		}
 
 		//public static int SizeInBytes => System.Runtime.InteropServices.Marshal.SizeOf(typeof(BitmapInfoHeader));
-		public static int SizeInBytes => 56;
+		public static int SizeInBytes => 40;
 
 
 		public byte[] HeaderInfoBytes {
 			get {
+				var byteArray = new byte[BitmapInfoHeader.SizeInBytes]; // 40
+
+				var size = BitConverter.GetBytes( BitmapInfoHeader.SizeInBytes );
+
+				var width = BitConverter.GetBytes( Width );
+				var height = BitConverter.GetBytes( Height );
+				var colorPlanes = BitConverter.GetBytes( ColorPlanes );
+				var bitsPerPixel = BitConverter.GetBytes( (short) BitsPerPixel );
+				var compressionMethod = BitConverter.GetBytes( (int) CompressionMethod );
+				var imageSize = BitConverter.GetBytes( (int) this.ImageSize );
+				var horizontalPixelPerMeter = BitConverter.GetBytes( (int) this.HorizontalPixelPerMeter );
+				BitConverter.GetBytes( (int) this.VerticalPixelPerMeter ).CopyTo( byteArray, 28 );   //	4 bytes
+				BitConverter.GetBytes( (int) this.nuberOfColorsInPallete ).CopyTo( byteArray, 32 );   // 4 bytes
+				BitConverter.GetBytes( (int) this.numberOfImportantColorsUsed ).CopyTo( byteArray, 36 ); //	4 bytes
+				// total 40 bytes
+
 				throw new NotImplementedException();
-				//return BinarySerializationExtensions.Serialize<BitmapInfoHeader>( this );
+
+				byte[] offset = BitConverter.GetBytes( this.pixelDataOffset );
+
+				// BMP byte order is little endian so we have to take care on byte ordering
+				if (!System.BitConverter.IsLittleEndian) {
+					// we are on BigEndian system so we have to revers byte order
+					Array.Reverse( size );
+					Array.Reverse( width );
+					Array.Reverse( height );
+					Array.Reverse( colorPlanes );
+					Array.Reverse( bitsPerPixel );
+					Array.Reverse( compressionMethod );
+					Array.Reverse( imageSize );
+					Array.Reverse( horizontalPixelPerMeter );
+					Array.Reverse( - );
+					Array.Reverse( - );
+					Array.Reverse( - );
+					Array.Reverse( - );
+
+				}
+				size.CopyTo( byteArray, 0 );   //	0, 4 bytes 	The headerSize of the BMP file in bytes
+				width.CopyTo( byteArray, 4 );   //	 4 bytes
+				height.CopyTo( byteArray, 8 );   // 4 bytes
+				colorPlanes.CopyTo( byteArray, 12 );   //	12, 4 bytes
+				bitsPerPixel.CopyTo( byteArray, 14 );   //	2 bytes
+				compressionMethod.CopyTo( byteArray, 16 );   // 4 bytes
+				imageSize.CopyTo( byteArray, 20 );   //	 4 bytes
+				horizontalPixelPerMeter.CopyTo( byteArray, 24 ); //	4 bytes
+
+
+				// everything is ok
+				sizeBytes.CopyTo( byteArray, 2 );//02 	2 	4 bytes 	The headerSize of the BMP file in bytes
+				offset.CopyTo( byteArray, 10 );//0A 	10 	4 bytes 	The offset, i.e. starting address, of the byte where the bitmap image data (pixel array) can be found.
+
+				//var infoHeaderBytes = this.infoHeader.HeaderInfoBytes;
+				//Buffer.BlockCopy( infoHeaderBytes, 0, byteArray, 14, infoHeaderBytes.Length );
+
+				return byteArray;
 			}
 		}
 
