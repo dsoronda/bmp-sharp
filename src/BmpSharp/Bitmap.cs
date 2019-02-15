@@ -13,6 +13,19 @@ namespace BmpSharp {
 		RGBA32 = 32
 	}
 
+	public enum CompressionMethod : int {
+		BI_RGB = 0, // none
+		BI_RLE8 = 1,
+		BI_RLE4 = 2,
+		BI_BITFIELDS = 3,
+		BI_JPEG = 4,
+		BI_PNG = 5,
+		BI_ALPHABITFIELDS = 6,
+		BI_CMYK = 11,
+		BI_CMYKRLE8 = 12,
+		BI_CMYKRLE4 = 13
+	}
+
 	public class Bitmap {
 		public int Width { get; } = 0;
 		public int Height { get; } = 0;
@@ -54,7 +67,8 @@ namespace BmpSharp {
 			}
 		}
 
-		public BitmapHeader Header { get; }
+		public BitmapFileHeader FileHeader { get; }
+		public byte[] InfoHeaderBytes { get; }
 
 		public Bitmap( int width, int height, byte[] pixelData, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24 ) {
 			this.Width = width;
@@ -62,7 +76,11 @@ namespace BmpSharp {
 			this.PixelData = pixelData ?? throw new ArgumentNullException( nameof( pixelData ) );
 			this.BitsPerPixelEnum = bitsPerPixel;
 			var rawImageSize = BytesPerRow * height;
-			this.Header = new BitmapHeader( width, height, bitsPerPixel, rawImageSize );
+			this.FileHeader = new BitmapFileHeader( width, height, bitsPerPixel, rawImageSize );
+			if (bitsPerPixel == BitsPerPixelEnum.RGB24)
+				this.InfoHeaderBytes = ( new BitmapInfoHeader( width, height, bitsPerPixel ) ).HeaderInfoBytes;
+			if (bitsPerPixel == BitsPerPixelEnum.RGBA32)
+				this.InfoHeaderBytes = ( new BitmapInfoHeaderRGBA( width, height, bitsPerPixel ) ).HeaderInfoBytes;
 		}
 
 		/// <summary>
@@ -72,13 +90,13 @@ namespace BmpSharp {
 		/// <returns></returns>
 		public byte[] GenerateBmpBytes( bool flipped = false ) {
 			//var rawImageSize = BytesPerRow * Height;
-			//var buffer = new byte[BitmapHeader.BitmapHeaderSizeInBytes + rawImageSize];
-			//Buffer.BlockCopy( this.Header.HeaderBytes, 0, buffer, 0, BitmapHeader.BitmapHeaderSizeInBytes );
+			//var buffer = new byte[BitmapFileHeader.BitmapFileHeaderSizeInBytes + rawImageSize];
+			//Buffer.BlockCopy( this.FileHeader.HeaderBytes, 0, buffer, 0, BitmapFileHeader.BitmapFileHeaderSizeInBytes );
 
 			//if (flipped) {
-			//	Buffer.BlockCopy( this.PixelDataFliped, 0, buffer, BitmapHeader.BitmapHeaderSizeInBytes, PixelData.Length );
+			//	Buffer.BlockCopy( this.PixelDataFliped, 0, buffer, BitmapFileHeader.BitmapFileHeaderSizeInBytes, PixelData.Length );
 			//} else {
-			//	Buffer.BlockCopy( this.PixelData, 0, buffer, BitmapHeader.BitmapHeaderSizeInBytes, PixelData.Length );
+			//	Buffer.BlockCopy( this.PixelData, 0, buffer, BitmapFileHeader.BitmapFileHeaderSizeInBytes, PixelData.Length );
 			//}
 			//return buffer;
 
@@ -90,16 +108,16 @@ namespace BmpSharp {
 		public MemoryStream GetStream( bool fliped = false ) {
 			var rawImageSize = BytesPerRow * Height;
 
-			//var stream = new System.IO.MemoryStream( BitmapHeader.BitmapHeaderSizeInBytes + (int) rawImageSize );
+			//var stream = new System.IO.MemoryStream( BitmapFileHeader.BitmapFileHeaderSizeInBytes + (int) rawImageSize );
 			var stream = new MemoryStream( rawImageSize );
 
 			//using (var writer = new BinaryWriter( stream )) {
 			var writer = new BinaryWriter( stream );
-			writer.Write( this.Header.HeaderBytes );
+			writer.Write( this.FileHeader.HeaderBytes );
+			writer.Write( this.InfoHeaderBytes);
 			writer.Flush();
 			stream.Flush();
 
-			// TODO : write info Header bytes !!!
 
 			var paddingRequired = BytesPerRow != ( Width * BytesPerPixel );
 			var bytesToCopy = Width * BytesPerPixel;

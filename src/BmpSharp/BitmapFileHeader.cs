@@ -4,18 +4,23 @@ using System.Runtime.InteropServices;
 
 namespace BmpSharp {
 	[StructLayout( LayoutKind.Sequential, Pack = 1 )]
-	public class BitmapHeader {
+	public class BitmapFileHeader {
 		/// <summary>
-		/// Header headerSize in bytes (fist 14 bytes from start)
+		/// FileHeader headerSize in bytes (fist 14 bytes from start)
 		/// </summary>
-		public const int BitmapHeaderSizeInBytes = 14; // 14 + 40 // THIS IS NOT TRUE
+		public const int BitmapFileHeaderSizeInBytes = 14; // 14 + 40 // THIS IS NOT TRUE
 
 		public const byte ByteZero = 0x42;
 		public const byte ByteOne = 0x4D;
-		public BitmapHeader( uint fileSize ) {
-			this.FileSize = fileSize;
 
+		/// <summary>
+		/// Explicitly set file in size
+		/// </summary>
+		/// <param name="fileSize"></param>
+		public BitmapFileHeader( uint fileSize ) {
+			this.FileSize = fileSize;
 		}
+
 		public uint FileSize { get; private set; }
 
 		/// <summary>
@@ -23,27 +28,32 @@ namespace BmpSharp {
 		/// </summary>
 		public uint pixelDataOffset;
 
-		public BitmapInfoHeader infoHeader;
-
-		public BitmapHeader( int width = 1, int height = 1, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, int rawImageSize = 0 ) {
+		/// <summary>
+		/// Create header and calculate file size depending on input data
+		/// </summary>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="bitsPerPixel"></param>
+		/// <param name="rawImageSize">Depends on row padding and number of rows</param>
+		public BitmapFileHeader( int width = 1, int height = 1, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, int rawImageSize = 0 ) {
 			//if (System.BitConverter.IsLittleEndian)
 
 			//fileSize = (uint)(width * height * (int)bitsPerPixel) / 8;
-			FileSize = (uint) ( BitmapHeader.BitmapHeaderSizeInBytes + BitmapInfoHeader.SizeInBytes + rawImageSize);
+			FileSize = (uint) ( BitmapFileHeader.BitmapFileHeaderSizeInBytes + BitmapInfoHeader.SizeInBytes + rawImageSize);
 
-			pixelDataOffset = BitmapHeader.BitmapHeaderSizeInBytes + (uint) BitmapInfoHeader.SizeInBytes;
+			pixelDataOffset = BitmapFileHeader.BitmapFileHeaderSizeInBytes + (uint) BitmapInfoHeader.SizeInBytes;
 
-			infoHeader = new BitmapInfoHeader( width, height, bitsPerPixel: bitsPerPixel, rawImageSize: rawImageSize );
+			//infoHeader = new BitmapInfoHeader( width, height, bitsPerPixel: bitsPerPixel, rawImageSize: rawImageSize );
 		}
 
 		public byte[] HeaderBytes {
 			get {
-				var byteArray = new byte[BitmapHeader.BitmapHeaderSizeInBytes];	// 14
+				var byteArray = new byte[BitmapFileHeader.BitmapFileHeaderSizeInBytes];	// 14
 				//{ 0x42, 0x4d } BM string
 				byteArray[0] = ByteZero; // B
 				byteArray[1] = ByteOne;  // M
 				byte[] sizeBytes = BitConverter.GetBytes( this.FileSize );
-				byte[] offset = BitConverter.GetBytes( BitmapHeaderSizeInBytes );
+				byte[] offset = BitConverter.GetBytes( this.pixelDataOffset );
 
 				// BMP byte order is little endian so we have to take care on byte ordering
 				if (!System.BitConverter.IsLittleEndian) {
@@ -63,11 +73,11 @@ namespace BmpSharp {
 			}
 		}
 
-		public static BitmapHeader GetHeaderFromBytes( byte[] headerBytes ) {
+		public static BitmapFileHeader GetHeaderFromBytes( byte[] headerBytes ) {
 			if (headerBytes == null)
 				throw new ArgumentNullException( nameof( headerBytes ) );
-			if (headerBytes.Length != BitmapHeader.BitmapHeaderSizeInBytes)
-				throw new ArgumentOutOfRangeException( $"{nameof( headerBytes )} should be {BitmapHeader.BitmapHeaderSizeInBytes} bytes in headerSize" );
+			if (headerBytes.Length != BitmapFileHeader.BitmapFileHeaderSizeInBytes)
+				throw new ArgumentOutOfRangeException( $"{nameof( headerBytes )} should be {BitmapFileHeader.BitmapFileHeaderSizeInBytes} bytes in headerSize" );
 
 			//var width = BitConverter.ToUInt32(headerBytes, 2);
 
@@ -79,13 +89,10 @@ namespace BmpSharp {
 			var sizeBytes = BitConverter.ToUInt32( headerBytes, 2 );
 			var offset = BitConverter.ToUInt32( headerBytes, 10 );
 
-			var header = new BitmapHeader() {
+			var header = new BitmapFileHeader() {
 				pixelDataOffset = offset,
 				FileSize = sizeBytes
 			};
-
-			var infoHeader = BinarySerializationExtensions.Deserialize<BitmapInfoHeader>( headerBytes.Skip( 14 ).Take( 40 ).ToArray() );
-			header.infoHeader = infoHeader;
 
 			return header;
 		}

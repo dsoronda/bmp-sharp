@@ -10,18 +10,22 @@ namespace BmpSharp {
 				throw new Exception( $"File {fileName} not found" );
 
 			var fileInfo = new FileInfo( fileName );
-			if (fileInfo.Length <= BitmapHeader.BitmapHeaderSizeInBytes)
+			if (fileInfo.Length <= BitmapFileHeader.BitmapFileHeaderSizeInBytes)
 				throw new Exception( $"Invalid file format. Size is too small." );
 
 			using (var fileStream = File.OpenRead( fileName )) {
-				using (var bReader = new BinaryReader( fileStream )) {
-					var headerBytes = bReader.ReadBytes( BitmapHeader.BitmapHeaderSizeInBytes );
-					BitmapHeader header = BitmapHeader.GetHeaderFromBytes( headerBytes );
+				using (var bReader = new SafeBinaryReader( fileStream )) {
+					var headerBytes = bReader.ReadBytes( BitmapFileHeader.BitmapFileHeaderSizeInBytes );
+					var fileHeader = BitmapFileHeader.GetHeaderFromBytes( headerBytes );
 
-					if (fileInfo.Length < header.FileSize)
-						throw new Exception( $"File headerSize [{fileInfo.Length}] is smaller than expected [{header.FileSize}]." );
+					if (fileInfo.Length < fileHeader.FileSize)
+						throw new Exception( $"File headerSize [{fileInfo.Length}] is smaller than expected [{fileHeader.FileSize}]." );
 
-					var infoHeader = header.infoHeader;
+					var dibHeaderSize = bReader.ReadInt32();
+					fileStream.Seek( -4, SeekOrigin.Current );
+
+					var infoHeader = BitmapInfoHeader.GetHeaderFromBytes( bReader.ReadBytes( dibHeaderSize ) );
+
 					var width = infoHeader.width;
 					var height = infoHeader.height;
 
@@ -33,7 +37,7 @@ namespace BmpSharp {
 
 					var pixelData = new byte[width * height * bytesPerPixel];
 					// seek to location where pixel data is
-					fileStream.Seek(header.pixelDataOffset, SeekOrigin.Begin);
+					fileStream.Seek(fileHeader.pixelDataOffset, SeekOrigin.Begin);
 
 					if (paddingRequired) {
 						var bytesToCopy = width * bytesPerPixel;

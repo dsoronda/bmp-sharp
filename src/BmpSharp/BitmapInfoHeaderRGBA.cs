@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace BmpSharp {
 	[StructLayout( LayoutKind.Sequential, Pack = 1 )]
-	public struct BitmapInfoHeader {
+	public struct BitmapInfoHeaderRGBA {
 		// NOTE : do not reorder fields !!! we use this layout for direct binary de/serialization!!
 
 		// Warning CS0414  The field 'BitmapInfoHeader.horizontalPixelPerMeter' is assigned but its value is never used
@@ -57,6 +57,11 @@ namespace BmpSharp {
 		public readonly uint nuberOfColorsInPallete;
 
 		public readonly uint numberOfImportantColorsUsed;
+
+		public const uint RedChannelBitMask = 0x0FF0000;
+		public const uint GreenChannelBitMask = 0x0000FF00;
+		public const uint BlueChannelBitMask = 0x000000FF;
+		public const uint AlphaChannelBitMask = 0xFF000000;
 #pragma warning restore CS0414
 
 		/// <summary>
@@ -67,7 +72,7 @@ namespace BmpSharp {
 		/// <param name="height"></param>
 		/// <param name="bitsPerPixel"></param>
 		/// <param name="rawImageSize"></param>
-		public BitmapInfoHeader( int width, int height, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, int rawImageSize = 0, int horizontalPixelPerMeter = 3780, int verticalPixelPerMeter = 3780 ) {
+		public BitmapInfoHeaderRGBA( int width, int height, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, int rawImageSize = 0, int horizontalPixelPerMeter = 3780, int verticalPixelPerMeter = 3780 ) {
 			bitmapInfoHeaderSize = SizeInBytes;
 			this.width = width;
 			this.height = height;
@@ -82,9 +87,9 @@ namespace BmpSharp {
 		}
 
 		//public static int SizeInBytes => System.Runtime.InteropServices.Marshal.SizeOf(typeof(BitmapInfoHeader));
-		public const int SizeInBytes = 40;
-
-		public byte[] HeaderInfoBytes => BinarySerializationExtensions.Serialize<BitmapInfoHeader>( this );
+		public const int SizeInBytes = 56;
+		
+		public byte[] HeaderInfoBytes => BinarySerializationExtensions.Serialize<BitmapInfoHeaderRGBA>( this );
 
 		public static BitmapInfoHeader GetHeaderFromBytes( byte[] bytes ) {
 
@@ -107,8 +112,8 @@ namespace BmpSharp {
 				Array.Reverse( bytes, 0X20, 4 ); // the image size. This is the size of the raw bitmap data; a dummy 0 can be given for BI_RGB bitmaps.
 				Array.Reverse( bytes, HORIZONTAL_RESOLUTION_OFFSET, 4 ); // the horizontal resolution of the image. (pixel per metre, signed integer) 
 				Array.Reverse( bytes, VERTICAL_RESOLUTION_OFFSET, 4 ); // the vertical resolution of the image. (pixel per metre, signed integer) 
-				Array.Reverse( bytes, 0x2C, 4 ); // the number of colors in the color palette, or 0 to default to 2n (ignored)
-				Array.Reverse( bytes, 0x32, 4 ); // the number of important colors used, or 0 when every color is important; generally ignored 
+				//Array.Reverse( bytes, 0x2C, 4 ); // the number of colors in the color palette, or 0 to default to 2n (ignored)
+				//Array.Reverse( bytes, 0x32, 4 ); // the number of important colors used, or 0 when every color is important; generally ignored 
 			}
 
 			var headerSize = BitConverter.ToInt32( bytes, 0 );

@@ -14,7 +14,7 @@ namespace Tests {
 
 			var data = new byte[] { 127, 64, 192 };
 			var bmp = new Bitmap( 1, 1, data );
-			var bufferSize = BitmapHeader.BitmapHeaderSizeInBytes + bmp.BytesPerRow;
+			var bufferSize = BitmapFileHeader.BitmapFileHeaderSizeInBytes + bmp.BytesPerRow;
 
 			var buffer = new byte[bufferSize];
 			using (var memoryStream = bmp.GetStream()) {
@@ -22,8 +22,8 @@ namespace Tests {
 				Assert.AreEqual( bufferSize, readedBytes, "we get less bytes from stream than expected" );
 			}
 
-			Assert.AreEqual( BitmapHeader.ByteZero, buffer[0], "invalid header byte[0]" );
-			Assert.AreEqual( BitmapHeader.ByteOne, buffer[1], "invalid header byte[1]" );
+			Assert.AreEqual( BitmapFileHeader.ByteZero, buffer[0], "invalid fileHeader byte[0]" );
+			Assert.AreEqual( BitmapFileHeader.ByteOne, buffer[1], "invalid fileHeader byte[1]" );
 
 			if (!BitConverter.IsLittleEndian)
 				Array.Reverse( buffer, 2, sizeof( uint ) );
