@@ -76,11 +76,14 @@ namespace BmpSharp {
 			this.PixelData = pixelData ?? throw new ArgumentNullException( nameof( pixelData ) );
 			this.BitsPerPixelEnum = bitsPerPixel;
 			var rawImageSize = BytesPerRow * height;
-			this.FileHeader = new BitmapFileHeader( width, height, bitsPerPixel, rawImageSize );
+
 			if (bitsPerPixel == BitsPerPixelEnum.RGB24)
-				this.InfoHeaderBytes = new BitmapInfoHeader( width, height, bitsPerPixel ).HeaderInfoBytes;
-			if (bitsPerPixel == BitsPerPixelEnum.RGBA32)
-				this.InfoHeaderBytes = new BitmapInfoHeaderRGBA( width, height, bitsPerPixel ).HeaderInfoBytes;
+				this.InfoHeaderBytes = new BitmapInfoHeader( width, height, bitsPerPixel, rawImageSize ).HeaderInfoBytes;
+			if (bitsPerPixel == BitsPerPixelEnum.RGBA32) {
+				this.InfoHeaderBytes = new BitmapInfoHeaderRGBA( width, height, bitsPerPixel, rawImageSize ).HeaderInfoBytes;
+			}
+
+			this.FileHeader = new BitmapFileHeader( width, height, bitsPerPixel, rawImageSize );
 		}
 
 		/// <summary>
@@ -118,7 +121,6 @@ namespace BmpSharp {
 			writer.Flush();
 			stream.Flush();
 
-
 			var paddingRequired = BytesPerRow != ( Width * BytesPerPixel );
 			var bytesToCopy = Width * BytesPerPixel;
 			var pixData = fliped ? PixelDataFliped : PixelData;
@@ -132,6 +134,7 @@ namespace BmpSharp {
 			} else {
 				writer.Write( pixData );
 			}
+
 			stream.Position = 0;
 
 			return stream;

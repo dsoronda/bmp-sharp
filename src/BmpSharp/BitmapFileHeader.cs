@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace BmpSharp {
@@ -37,19 +36,19 @@ namespace BmpSharp {
 		/// <param name="rawImageSize">Depends on row padding and number of rows</param>
 		public BitmapFileHeader( int width = 1, int height = 1, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, int rawImageSize = 0 ) {
 			//if (System.BitConverter.IsLittleEndian)
+			var infoHeaderSize = bitsPerPixel == BitsPerPixelEnum.RGB24 ? BitmapInfoHeader.SizeInBytes : BitmapInfoHeaderRGBA.SizeInBytes;
 
-			//fileSize = (uint)(Width * Height * (int)BitsPerPixel) / 8;
-			FileSize = (uint) ( BitmapFileHeader.BitmapFileHeaderSizeInBytes + BitmapInfoHeader.SizeInBytes + rawImageSize);
+			FileSize = (uint) ( BitmapFileHeader.BitmapFileHeaderSizeInBytes + infoHeaderSize + rawImageSize );
 
-			pixelDataOffset = BitmapFileHeader.BitmapFileHeaderSizeInBytes + (uint) BitmapInfoHeader.SizeInBytes;
+			pixelDataOffset = (uint) ( BitmapFileHeader.BitmapFileHeaderSizeInBytes + infoHeaderSize );
 
 			//infoHeader = new BitmapInfoHeader( Width, Height, BitsPerPixel: BitsPerPixel, rawImageSize: rawImageSize );
 		}
 
 		public byte[] HeaderBytes {
 			get {
-				var byteArray = new byte[BitmapFileHeader.BitmapFileHeaderSizeInBytes];	// 14
-				//{ 0x42, 0x4d } BM string
+				var byteArray = new byte[BitmapFileHeader.BitmapFileHeaderSizeInBytes]; // 14
+																						//{ 0x42, 0x4d } BM string
 				byteArray[0] = ByteZero; // B
 				byteArray[1] = ByteOne;  // M
 				byte[] sizeBytes = BitConverter.GetBytes( this.FileSize );
@@ -65,9 +64,6 @@ namespace BmpSharp {
 				// everything is ok
 				sizeBytes.CopyTo( byteArray, 2 );//02 	2 	4 bytes 	The headerSize of the BMP file in bytes
 				offset.CopyTo( byteArray, 10 );//0A 	10 	4 bytes 	The offset, i.e. starting address, of the byte where the bitmap image data (pixel array) can be found.
-
-				//var infoHeaderBytes = this.infoHeader.HeaderInfoBytes;
-				//Buffer.BlockCopy( infoHeaderBytes, 0, byteArray, 14, infoHeaderBytes.Length );
 
 				return byteArray;
 			}

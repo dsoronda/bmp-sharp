@@ -18,13 +18,13 @@ namespace BmpSharp {
 					var headerBytes = bReader.ReadBytes( BitmapFileHeader.BitmapFileHeaderSizeInBytes );
 					var fileHeader = BitmapFileHeader.GetHeaderFromBytes( headerBytes );
 
-					if (fileInfo.Length < fileHeader.FileSize)
-						throw new Exception( $"File headerSize [{fileInfo.Length}] is smaller than expected [{fileHeader.FileSize}]." );
+					if (fileInfo.Length != fileHeader.FileSize)
+						throw new Exception( $"File size is different than in header." );
 
 					var dibHeaderSize = bReader.ReadInt32();
 					fileStream.Seek( -4, SeekOrigin.Current );
 
-					var infoHeader = BitmapInfoHeader.GetHeaderFromBytes( bReader.ReadBytes( dibHeaderSize ) );
+					BitmapInfoHeader infoHeader = BitmapInfoHeader.GetHeaderFromBytes( bReader.ReadBytes( dibHeaderSize ) );
 
 					var width = infoHeader.Width;
 					var height = infoHeader.Height;
@@ -34,7 +34,6 @@ namespace BmpSharp {
 					var bytesPerPixel = (int) infoHeader.BitsPerPixel / 8;
 					var paddingRequired = Bitmap.IsPaddingRequired( infoHeader.Width, infoHeader.BitsPerPixel,
 					bytesPerRow );
-
 					var pixelData = new byte[width * height * bytesPerPixel];
 					// seek to location where pixel data is
 					fileStream.Seek( fileHeader.pixelDataOffset, SeekOrigin.Begin );
@@ -46,7 +45,8 @@ namespace BmpSharp {
 							Buffer.BlockCopy( src: rowBuffer, srcOffset: 0, dst: pixelData, dstOffset: counter * bytesToCopy, count: bytesToCopy );
 						}
 					} else {
-
+						var rowBuffer = bReader.ReadBytes( pixelData.Length );
+						rowBuffer.CopyTo(pixelData,0);
 					}
 
 					var bitmap = new Bitmap(

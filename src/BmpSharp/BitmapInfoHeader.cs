@@ -85,7 +85,7 @@ namespace BmpSharp {
 		public static int SizeInBytes => 40;
 
 
-		public byte[] HeaderInfoBytes {
+		public virtual byte[] HeaderInfoBytes {
 			get {
 				var byteArray = new byte[BitmapInfoHeader.SizeInBytes]; // 40
 
@@ -98,14 +98,12 @@ namespace BmpSharp {
 				var compressionMethod = BitConverter.GetBytes( (int) CompressionMethod );
 				var imageSize = BitConverter.GetBytes( (int) this.ImageSize );
 				var horizontalPixelPerMeter = BitConverter.GetBytes( (int) this.HorizontalPixelPerMeter );
-				BitConverter.GetBytes( (int) this.VerticalPixelPerMeter ).CopyTo( byteArray, 28 );   //	4 bytes
-				BitConverter.GetBytes( (int) this.nuberOfColorsInPallete ).CopyTo( byteArray, 32 );   // 4 bytes
-				BitConverter.GetBytes( (int) this.numberOfImportantColorsUsed ).CopyTo( byteArray, 36 ); //	4 bytes
+				var verticalPixelPerMeter = BitConverter.GetBytes( (int) this.VerticalPixelPerMeter );
+
+				var nuberOfColorsInPallete = BitConverter.GetBytes( (int) this.nuberOfColorsInPallete );
+				var numberOfImportantColorsUsed = BitConverter.GetBytes( (int) this.numberOfImportantColorsUsed );
 				// total 40 bytes
 
-				throw new NotImplementedException();
-
-				byte[] offset = BitConverter.GetBytes( this.pixelDataOffset );
 
 				// BMP byte order is little endian so we have to take care on byte ordering
 				if (!System.BitConverter.IsLittleEndian) {
@@ -118,12 +116,11 @@ namespace BmpSharp {
 					Array.Reverse( compressionMethod );
 					Array.Reverse( imageSize );
 					Array.Reverse( horizontalPixelPerMeter );
-					Array.Reverse( - );
-					Array.Reverse( - );
-					Array.Reverse( - );
-					Array.Reverse( - );
-
+					Array.Reverse( verticalPixelPerMeter );
+					Array.Reverse( nuberOfColorsInPallete );
+					Array.Reverse( numberOfImportantColorsUsed );
 				}
+
 				size.CopyTo( byteArray, 0 );   //	0, 4 bytes 	The headerSize of the BMP file in bytes
 				width.CopyTo( byteArray, 4 );   //	 4 bytes
 				height.CopyTo( byteArray, 8 );   // 4 bytes
@@ -132,14 +129,9 @@ namespace BmpSharp {
 				compressionMethod.CopyTo( byteArray, 16 );   // 4 bytes
 				imageSize.CopyTo( byteArray, 20 );   //	 4 bytes
 				horizontalPixelPerMeter.CopyTo( byteArray, 24 ); //	4 bytes
-
-
-				// everything is ok
-				sizeBytes.CopyTo( byteArray, 2 );//02 	2 	4 bytes 	The headerSize of the BMP file in bytes
-				offset.CopyTo( byteArray, 10 );//0A 	10 	4 bytes 	The offset, i.e. starting address, of the byte where the bitmap image data (pixel array) can be found.
-
-				//var infoHeaderBytes = this.infoHeader.HeaderInfoBytes;
-				//Buffer.BlockCopy( infoHeaderBytes, 0, byteArray, 14, infoHeaderBytes.Length );
+				verticalPixelPerMeter.CopyTo( byteArray, 28 );   //	4 bytes
+				nuberOfColorsInPallete.CopyTo( byteArray, 32 );   // 4 bytes
+				numberOfImportantColorsUsed.CopyTo( byteArray, 36 ); //	4 bytes
 
 				return byteArray;
 			}

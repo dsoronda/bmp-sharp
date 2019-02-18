@@ -5,20 +5,19 @@ namespace BmpSharp {
 	[StructLayout( LayoutKind.Sequential, Pack = 1 )]
 	public class BitmapInfoHeaderRGBA : BitmapInfoHeader {
 
-		public const uint RedChannelBitMask = 0x0FF0000;
+		public const uint RedChannelBitMask = 0x00FF0000;
 		public const uint GreenChannelBitMask = 0x0000FF00;
 		public const uint BlueChannelBitMask = 0x000000FF;
 		public const uint AlphaChannelBitMask = 0xFF000000;
 #pragma warning restore CS0414
-		
+
 		/// <summary>
 		/// DIB header (bitmap information header)
 		/// This is standard Windows BITMAPINFOHEADER as described here https://en.wikipedia.org/wiki/BMP_file_format#Bitmap_file_header
 		/// </summary>
 		public BitmapInfoHeaderRGBA( int width, int height, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24, int rawImageSize = 0, int horizontalPixelPerMeter = 3780, int verticalPixelPerMeter = 3780, CompressionMethod compressionMethod = CompressionMethod.BI_BITFIELDS ) :
-		base(width,height, bitsPerPixel,rawImageSize,horizontalPixelPerMeter,verticalPixelPerMeter,compressionMethod)
-		{
-			this.Width = width;
+		base( width, height, bitsPerPixel, rawImageSize, horizontalPixelPerMeter, verticalPixelPerMeter, compressionMethod ) {
+			//this.Width = width;
 			//this.Height = height;
 
 			//this.BitsPerPixel = bitsPerPixel;
@@ -31,11 +30,44 @@ namespace BmpSharp {
 		//public static int SizeInBytes => System.Runtime.InteropServices.Marshal.SizeOf(typeof(BitmapInfoHeader));
 		public static int SizeInBytes => 56;
 
+		/// <summary>
+		/// This is BitmapInfoHeader for ARGB32 as described here https://en.wikipedia.org/wiki/BMP_file_format#Example_2
+		/// </summary>
 		public new byte[] HeaderInfoBytes //=> BinarySerializationExtensions.Serialize<BitmapInfoHeaderRGBA>( this );
 		{
 			get {
-				throw new NotImplementedException();
-				//return BinarySerializationExtensions.Serialize<BitmapInfoHeader>( this );
+				var byteArray = new byte[BitmapInfoHeaderRGBA.SizeInBytes]; // 56
+
+				// get base array
+				base.HeaderInfoBytes.CopyTo(byteArray,0);
+
+
+
+				// chage header size
+				var size = BitConverter.GetBytes( BitmapInfoHeaderRGBA.SizeInBytes );
+
+				var redChannelBitMaskBytes = BitConverter.GetBytes( RedChannelBitMask );
+				var greenChannelBitMaskBytes = BitConverter.GetBytes( GreenChannelBitMask );
+				var blueChannelBitMaskBytes = BitConverter.GetBytes( BlueChannelBitMask );
+				var alphaChannelBitMaskBytes = BitConverter.GetBytes( AlphaChannelBitMask );
+
+				// BMP byte order is little endian so we have to take care on byte ordering
+				if (!System.BitConverter.IsLittleEndian) {
+					// we are on BigEndian system so we have to revers byte order
+					Array.Reverse( size );
+					Array.Reverse( redChannelBitMaskBytes );
+					Array.Reverse( greenChannelBitMaskBytes );
+					Array.Reverse( blueChannelBitMaskBytes );
+					Array.Reverse( alphaChannelBitMaskBytes );
+				}
+
+				size.CopyTo( byteArray, 0 );   //	0, 4 bytes 	The headerSize of the BMP file in bytes
+				redChannelBitMaskBytes.CopyTo( byteArray, 0x28 );   //	0, 4 bytes 	The headerSize of the BMP file in bytes
+				greenChannelBitMaskBytes.CopyTo( byteArray, 0x2C );   //	0, 4 bytes 	The headerSize of the BMP file in bytes
+				blueChannelBitMaskBytes.CopyTo( byteArray, 0x30 );   //	0, 4 bytes 	The headerSize of the BMP file in bytes
+				alphaChannelBitMaskBytes.CopyTo( byteArray, 0x34 );   //	0, 4 bytes 	The headerSize of the BMP file in bytes
+
+				return byteArray;
 			}
 		}
 
