@@ -1,6 +1,6 @@
 # BMP# (bmp-sharp)
 
-Simple .NetStandard C# library for handling Bitmap (BMP) files.
+Simple native .NetStandard C# library for handling Bitmap (BMP) files.
 
 ## Description
 
@@ -20,3 +20,9 @@ I'm working on a library that will help me parse CIFAR 10 dataset and I wanted t
 - 1/4/8 bits per pixel support (i'm open for pull requests)
 - Alpha channels
 
+## History
+
+### 0.1.0 Initial release
+
+- Added support of saving byte[] to BMP
+- Should support reading/saving of little/big endian platforms (x86 / ARM)
