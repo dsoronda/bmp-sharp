@@ -22,7 +22,7 @@ namespace Tests {
 
 		[Test]
 		public void ReadFileAsBitmap_Success() {
-			Bitmap bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
+			var bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
 			Assert.NotNull( bitmap );
 
 			Assert.AreEqual( 10, bitmap.Width );
@@ -37,19 +37,19 @@ namespace Tests {
 
 		[Test]
 		public void WriteFileAsBitmap_Success() {
-			Bitmap bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
+			var bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
 			var tempFolder = System.IO.Path.GetTempPath();
 			var targetFile = Path.Combine( tempFolder, TestFileName_RGB );
 			BitmapFileHelper.SaveBitmapToFile( targetFile, bitmap );
 
 			Assert.IsTrue( File.Exists( targetFile ) );
 			var fileInfo = new FileInfo( targetFile );
-			Assert.AreEqual( bitmap.GenerateBmpBytes().Length, fileInfo.Length );
+			Assert.AreEqual( bitmap.GetBmpBytes().Length, fileInfo.Length );
 		}
 
 		[Test]
 		public void RGBA_ReadFileAsBitmap_Success() {
-			Bitmap bitmap = BitmapFileHelper.ReadFileAsBitmap( RGBA_TestImageFullPath );
+			var bitmap = BitmapFileHelper.ReadFileAsBitmap( RGBA_TestImageFullPath );
 			Assert.NotNull( bitmap );
 
 			Assert.AreEqual( 10, bitmap.Width );
@@ -58,21 +58,18 @@ namespace Tests {
 			Assert.AreEqual( bytesPerPixel, bitmap.BytesPerPixel );
 			Assert.AreEqual( 10 * 2 * bytesPerPixel, bitmap.PixelData.Length );
 			Assert.AreEqual( BitsPerPixelEnum.RGBA32, bitmap.BitsPerPixelEnum );
-
-			//Assert.Fail("not implemented");
 		}
-
 
 		[Test]
 		public void RGBA_WriteFileAsBitmap_Success() {
-			Bitmap bitmap = BitmapFileHelper.ReadFileAsBitmap( RGBA_TestImageFullPath );
+			var bitmap = BitmapFileHelper.ReadFileAsBitmap( RGBA_TestImageFullPath );
 			var tempFolder = System.IO.Path.GetTempPath();
 			var targetFile = Path.Combine( tempFolder, RGBA_TestFileName );
 			BitmapFileHelper.SaveBitmapToFile( targetFile, bitmap );
 
 			Assert.IsTrue( File.Exists( targetFile ) );
 			var fileInfo = new FileInfo( targetFile );
-			Assert.AreEqual( bitmap.GenerateBmpBytes().Length, fileInfo.Length );
+			Assert.AreEqual( bitmap.GetBmpBytes().Length, fileInfo.Length );
 		}
 	}
 }
