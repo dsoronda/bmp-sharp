@@ -22,7 +22,7 @@ namespace Tests {
 
 		[Test]
 		public void ReadFileAsBitmap_Success() {
-			Bitmap bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
+			var bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
 			Assert.NotNull( bitmap );
 
 			Assert.AreEqual( 10, bitmap.Width );
