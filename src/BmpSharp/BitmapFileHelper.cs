@@ -24,7 +24,7 @@ namespace BmpSharp {
 					var dibHeaderSize = bReader.ReadInt32();
 					fileStream.Seek( -4, SeekOrigin.Current );
 
-					BitmapInfoHeader infoHeader = BitmapInfoHeader.GetHeaderFromBytes( bReader.ReadBytes( dibHeaderSize ) );
+					var infoHeader = BitmapInfoHeader.GetHeaderFromBytes( bReader.ReadBytes( dibHeaderSize ) );
 
 					var width = infoHeader.Width;
 					var height = infoHeader.Height;
@@ -36,7 +36,7 @@ namespace BmpSharp {
 					bytesPerRow );
 					var pixelData = new byte[width * height * bytesPerPixel];
 					// seek to location where pixel data is
-					fileStream.Seek( fileHeader.pixelDataOffset, SeekOrigin.Begin );
+					fileStream.Seek( fileHeader.PixelDataOffset, SeekOrigin.Begin );
 
 					if (paddingRequired) {
 						var bytesToCopy = width * bytesPerPixel;
@@ -70,7 +70,7 @@ namespace BmpSharp {
 				throw new Exception( $"Destination directory not found." );
 
 			using (var fileStream = File.Create( fileName )) {
-				using (var bmpStream = bitmap.GetStream()) {
+				using (var bmpStream = bitmap.GetBmpStream()) {
 					bmpStream.CopyTo( fileStream, bufferSize: 16 * 1024 );
 				}
 			}

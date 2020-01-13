@@ -59,7 +59,7 @@ namespace BmpSharp {
 
 				for (var row = totalRows - 1; row >= 0; row--) {
 					// NOTE: this only works on images that are 8/24/32 bits per pixel
-					byte[] one_row = PixelData.Skip( row * Width * BytesPerPixel ).Take( Width * BytesPerPixel ).ToArray();
+					var one_row = PixelData.Skip( row * Width * BytesPerPixel ).Take( Width * BytesPerPixel ).ToArray();
 					rowListData.Add( one_row );
 				}
 				var reversedBytes = rowListData.SelectMany( row => row ).ToArray();
@@ -70,12 +70,25 @@ namespace BmpSharp {
 		public BitmapFileHeader FileHeader { get; }
 		public byte[] InfoHeaderBytes { get; }
 
+		/// <summary>
+		/// Create new Bitmap object
+		/// </summary>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="pixelData"></param>
+		/// <param name="bitsPerPixel"></param>
 		public Bitmap( int width, int height, byte[] pixelData, BitsPerPixelEnum bitsPerPixel = BitsPerPixelEnum.RGB24 ) {
 			this.Width = width;
 			this.Height = height;
 			this.PixelData = pixelData ?? throw new ArgumentNullException( nameof( pixelData ) );
+		
 			this.BitsPerPixelEnum = bitsPerPixel;
 			var rawImageSize = BytesPerRow * height;
+
+			// Are we receiving proper byte[] size ?
+			if (pixelData.Length != width * height * BytesPerPixel)
+				throw new ArgumentOutOfRangeException( $"{nameof( pixelData )} has invalid size." );
+
 
 			if (bitsPerPixel == BitsPerPixelEnum.RGB24)
 				this.InfoHeaderBytes = new BitmapInfoHeader( width, height, bitsPerPixel, rawImageSize ).HeaderInfoBytes;
@@ -91,7 +104,7 @@ namespace BmpSharp {
 		/// </summary>
 		/// <param name="flipped">Flip (reverse order of) rows. Bitmap pixel rows are stored from bottom to up as shown in image</param>
 		/// <returns></returns>
-		public byte[] GenerateBmpBytes( bool flipped = false ) {
+		public byte[] GetBmpBytes( bool flipped = false ) {
 			//var rawImageSize = BytesPerRow * Height;
 			//var buffer = new byte[BitmapFileHeader.BitmapFileHeaderSizeInBytes + rawImageSize];
 			//Buffer.BlockCopy( this.FileHeader.HeaderBytes, 0, buffer, 0, BitmapFileHeader.BitmapFileHeaderSizeInBytes );
@@ -103,12 +116,17 @@ namespace BmpSharp {
 			//}
 			//return buffer;
 
-			using (var stream = GetStream( flipped )) {
+			using (var stream = GetBmpStream( flipped )) {
 				return stream.ToArray();
 			}
 		}
 
-		public MemoryStream GetStream( bool fliped = false ) {
+		/// <summary>
+		/// Get bitmap as byte stream for saving to file
+		/// </summary>
+		/// <param name="flipped">Flip (reverse order of) rows. Bitmap pixel rows are stored from bottom to up as shown in image</param>
+		/// <returns></returns>
+		public MemoryStream GetBmpStream( bool fliped = false ) {
 			var rawImageSize = BytesPerRow * Height;
 
 			//var stream = new System.IO.MemoryStream( BitmapFileHeader.BitmapFileHeaderSizeInBytes + (int) rawImageSize );
@@ -141,7 +159,7 @@ namespace BmpSharp {
 		}
 
 		/// <summary>
-		/// BMP file must be aligned at 4 butes at the end of row
+		/// BMP file must be aligned at 4 bytes at the end of row
 		/// </summary>
 		/// <param name="width">Image Width</param>
 		/// <param name="bitsPerPixel">Bits per pixel</param>
@@ -154,7 +172,7 @@ namespace BmpSharp {
 		/// <param name="width">Width of image</param>
 		/// <param name="bitsPerPixel">Bits per pixels to calculate actual byte requirement</param>
 		/// <param name="bytesPerRow">BMP required bytes per row</param>
-		/// <returns>True/false if we need to allocate extra bytes (for BMP savign) for padding</returns>
+		/// <returns>True/false if we need to allocate extra bytes (for BMP saving) for padding</returns>
 		public static bool IsPaddingRequired( int width, BitsPerPixelEnum bitsPerPixel, int bytesPerRow ) =>
 			bytesPerRow != width * (int) bitsPerPixel / 8;
 
