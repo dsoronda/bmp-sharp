@@ -13,6 +13,15 @@ namespace BmpSharp {
 		RGBA32 = 32
 	}
 
+	/// <summary>
+	/// Number of bytes for specific Pixel format.
+	/// </summary>
+	public enum BytesPerPixelEnum : int {
+		RBG16 = 2,
+		RGB24 = 3,
+		RGBA32 = 4
+	}
+
 	public enum CompressionMethod : int {
 		BI_RGB = 0, // none
 		BI_RLE8 = 1,

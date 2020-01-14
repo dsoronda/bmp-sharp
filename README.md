@@ -6,7 +6,7 @@ Simple native .NetStandard C# library for handling Bitmap (BMP) files.
 
 This is simple Bitmap library that helps you wrap binary data (pixels) into BMP header for saving into file and vice versa.
 
-It supports only 24 BGR and 32 bits ABGR byte arrays.
+It supports only 24 bits BGR and 32 bits BGRA byte arrays.
 
 ## Why this library
 
@@ -22,10 +22,10 @@ I'm working on a library that will help me parse CIFAR 10 dataset and I wanted t
 
 ## History
 
-### 0.2.0 Initial release
+### 0.2.0 Bugfixes & RGBA32 Support
 
 - Some bug fixes
-- [WiP] Adding RGBA support (32 bits)
+- Added RGBA support (32 bits)
 
 ### 0.1.0 Initial release
 
