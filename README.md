@@ -24,7 +24,7 @@ I'm working on a library that will help me parse CIFAR 10 dataset and I wanted t
 
 ### 0.2.0 Bugfixes & RGBA32 Support
 
-- Some bug fixes
+- Bug fixes and Code refactoring (there are code breaking changes from version 0.1.0).
 - Added RGBA support (32 bits)
 
 ### 0.1.0 Initial release
