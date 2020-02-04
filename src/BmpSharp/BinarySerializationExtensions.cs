@@ -39,5 +39,7 @@ namespace BmpSharp
 
 			return structure;   // return new structure
 		}
+
+		public static Span<int> ToInt( this byte[] bytes ) => MemoryMarshal.Cast<byte, int>( bytes );
 	}
 }
