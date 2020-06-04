@@ -79,6 +79,12 @@ namespace BmpSharp {
 		public BitmapFileHeader FileHeader { get; }
 		public byte[] InfoHeaderBytes { get; }
 
+		public static Bitmap FromStream( Stream stream )
+			=> BitmapFileHelper.ReadBitmapFromStream( stream );
+
+		public static Bitmap FromFile( string filePath )
+			=> BitmapFileHelper.ReadFileAsBitmap( filePath );
+
 		/// <summary>
 		/// Create new Bitmap object
 		/// </summary>
@@ -90,7 +96,7 @@ namespace BmpSharp {
 			this.Width = width;
 			this.Height = height;
 			this.PixelData = pixelData ?? throw new ArgumentNullException( nameof( pixelData ) );
-		
+
 			this.BitsPerPixelEnum = bitsPerPixel;
 			var rawImageSize = BytesPerRow * height;
 
@@ -135,12 +141,21 @@ namespace BmpSharp {
 		/// </summary>
 		/// <param name="flipped">Flip (reverse order of) rows. Bitmap pixel rows are stored from bottom to up as shown in image</param>
 		/// <returns></returns>
-		public MemoryStream GetBmpStream( bool fliped = false ) {
+		public MemoryStream GetBmpStream( bool flipped = false ) {
 			var rawImageSize = BytesPerRow * Height;
-
 			//var stream = new System.IO.MemoryStream( BitmapFileHeader.BitmapFileHeaderSizeInBytes + (int) rawImageSize );
 			var stream = new MemoryStream( rawImageSize );
+			WriteToStream( stream, flipped );
+			stream.Position = 0;
+			return stream;
+		}
 
+		/// <summary>
+		/// Write bitmap to a stream
+		/// </summary>
+		/// <param name="stream">The destination stream.</param>
+		/// <param name="flipped">Flip (reverse order of) rows. Bitmap pixel rows are stored from bottom to up as shown in image</param>
+		public void WriteToStream( Stream stream, bool flipped = false ) {
 			//using (var writer = new BinaryWriter( stream )) {
 			var writer = new BinaryWriter( stream );
 			writer.Write( this.FileHeader.HeaderBytes );
@@ -150,21 +165,17 @@ namespace BmpSharp {
 
 			var paddingRequired = BytesPerRow != ( Width * BytesPerPixel );
 			var bytesToCopy = Width * BytesPerPixel;
-			var pixData = fliped ? PixelDataFliped : PixelData;
+			var pixData = flipped ? PixelDataFliped : PixelData;
 
 			if (paddingRequired) {
+				var rowBuffer = new byte[this.BytesPerRow];
 				for (var counter = 0; counter < Height; counter++) {
-					var rowBuffer = new byte[this.BytesPerRow];
 					Buffer.BlockCopy( src: pixData, srcOffset: counter * bytesToCopy, dst: rowBuffer, dstOffset: 0, count: bytesToCopy );
 					writer.Write( rowBuffer );
 				}
 			} else {
 				writer.Write( pixData );
 			}
-
-			stream.Position = 0;
-
-			return stream;
 		}
 
 		/// <summary>

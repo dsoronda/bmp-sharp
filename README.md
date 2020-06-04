@@ -67,6 +67,10 @@ Result:
 
 ## History
 
+### 0.3.0 Stream support
+
+- Added support for reading and writing from streams.
+
 ### 0.2.0 Bugfixes & RGBA32 Support
 
 - Bug fixes and Code refactoring (there are code breaking changes from version 0.1.0).

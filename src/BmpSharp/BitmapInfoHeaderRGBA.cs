@@ -28,7 +28,7 @@ namespace BmpSharp {
 		}
 
 		//public static int SizeInBytes => System.Runtime.InteropServices.Marshal.SizeOf(typeof(BitmapInfoHeader));
-		public static int SizeInBytes => 56;
+		public static new int SizeInBytes => 56;
 
 		/// <summary>
 		/// This is BitmapInfoHeader for ARGB32 as described here https://en.wikipedia.org/wiki/BMP_file_format#Example_2

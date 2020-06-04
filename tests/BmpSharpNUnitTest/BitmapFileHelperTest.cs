@@ -1,5 +1,6 @@
 using System.IO;
 using BmpSharp;
+using Microsoft.VisualBasic;
 using NUnit.Framework;
 
 namespace Tests {
@@ -36,6 +37,22 @@ namespace Tests {
 		}
 
 		[Test]
+		public void ReadBitmapFromStream_Success() {
+			using var stream = File.OpenRead( TestImageFullPath );
+			var bitmap = Bitmap.FromStream( stream );
+			Assert.NotNull( bitmap );
+
+			Assert.AreEqual( 10, bitmap.Width );
+			Assert.AreEqual( 2, bitmap.Height );
+			Assert.AreEqual( 3, bitmap.BytesPerPixel );
+			Assert.AreEqual( 10 * 2 * 3, bitmap.PixelData.Length );
+			Assert.AreEqual( BitsPerPixelEnum.RGB24, bitmap.BitsPerPixelEnum );
+
+
+			//Assert.Fail("not implemented");
+		}
+
+		[Test]
 		public void WriteFileAsBitmap_Success() {
 			var bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
 			var tempFolder = System.IO.Path.GetTempPath();
@@ -45,6 +62,15 @@ namespace Tests {
 			Assert.IsTrue( File.Exists( targetFile ) );
 			var fileInfo = new FileInfo( targetFile );
 			Assert.AreEqual( bitmap.GetBmpBytes().Length, fileInfo.Length );
+		}
+
+		[Test]
+		public void WriteBitmapToStream_Success() {
+			var bitmap = BitmapFileHelper.ReadFileAsBitmap( TestImageFullPath );
+			using var stream = new MemoryStream();
+			bitmap.WriteToStream( stream );
+
+			Assert.AreEqual( bitmap.GetBmpBytes().Length, stream.Length );
 		}
 
 		[Test]

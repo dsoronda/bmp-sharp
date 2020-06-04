@@ -3,7 +3,7 @@ using System.IO;
 
 namespace BmpSharp {
 	public static class BitmapFileHelper {
-		public static Bitmap ReadFileAsBitmap( string fileName, bool flipRows = false ) {
+		public static Bitmap ReadFileAsBitmap( string fileName ) {
 			if (string.IsNullOrWhiteSpace( fileName ))
 				throw new ArgumentNullException( nameof( fileName ) );
 			if (!File.Exists( fileName ))
@@ -13,51 +13,56 @@ namespace BmpSharp {
 			if (fileInfo.Length <= BitmapFileHeader.BitmapFileHeaderSizeInBytes)
 				throw new Exception( $"Invalid file format. Size is too small." );
 
-			using (var fileStream = File.OpenRead( fileName )) {
-				using (var bReader = new SafeBinaryReader( fileStream )) {
-					var headerBytes = bReader.ReadBytes( BitmapFileHeader.BitmapFileHeaderSizeInBytes );
-					var fileHeader = BitmapFileHeader.GetHeaderFromBytes( headerBytes );
+			using var fileStream = File.OpenRead( fileName );
+			return ReadBitmapFromStream( fileStream, fileInfo.Length );
+		}
 
-					if (fileInfo.Length != fileHeader.FileSize)
-						throw new Exception( $"File size is different than in header." );
+		public static Bitmap ReadBitmapFromStream( Stream stream )
+			=> ReadBitmapFromStream( stream, null );
 
-					var dibHeaderSize = bReader.ReadInt32();
-					fileStream.Seek( -4, SeekOrigin.Current );
+		private static Bitmap ReadBitmapFromStream( Stream stream, long? fileLength ) {
+			using var bReader = new SafeBinaryReader( stream );
 
-					var infoHeader = BitmapInfoHeader.GetHeaderFromBytes( bReader.ReadBytes( dibHeaderSize ) );
+			var headerBytes = bReader.ReadBytes( BitmapFileHeader.BitmapFileHeaderSizeInBytes );
+			var fileHeader = BitmapFileHeader.GetHeaderFromBytes( headerBytes );
 
-					var width = infoHeader.Width;
-					var height = infoHeader.Height;
+			if (fileLength != null && fileLength < fileHeader.FileSize)
+				throw new Exception( "Stream too small for bitmap." );
 
-					var bytesPerRow = Bitmap.RequiredBytesPerRow( infoHeader.Width, infoHeader.BitsPerPixel );
+			var dibHeaderSize = bReader.ReadInt32();
+			stream.Seek( -4, SeekOrigin.Current );
 
-					var bytesPerPixel = (int) infoHeader.BitsPerPixel / 8;
-					var paddingRequired = Bitmap.IsPaddingRequired( infoHeader.Width, infoHeader.BitsPerPixel,
-					bytesPerRow );
-					var pixelData = new byte[width * height * bytesPerPixel];
-					// seek to location where pixel data is
-					fileStream.Seek( fileHeader.PixelDataOffset, SeekOrigin.Begin );
+			var infoHeader = BitmapInfoHeader.GetHeaderFromBytes( bReader.ReadBytes( dibHeaderSize ) );
 
-					if (paddingRequired) {
-						var bytesToCopy = width * bytesPerPixel;
-						for (var counter = 0; counter < height; counter++) {
-							var rowBuffer = bReader.ReadBytes( bytesPerRow );
-							Buffer.BlockCopy( src: rowBuffer, srcOffset: 0, dst: pixelData, dstOffset: counter * bytesToCopy, count: bytesToCopy );
-						}
-					} else {
-						var rowBuffer = bReader.ReadBytes( pixelData.Length );
-						rowBuffer.CopyTo(pixelData,0);
-					}
+			var width = infoHeader.Width;
+			var height = infoHeader.Height;
 
-					var bitmap = new Bitmap(
-						width, height,
-						pixelData: pixelData,
-						bitsPerPixel: infoHeader.BitsPerPixel
-						);
-					return bitmap;
+			var bytesPerRow = Bitmap.RequiredBytesPerRow( infoHeader.Width, infoHeader.BitsPerPixel );
 
+			var bytesPerPixel = (int) infoHeader.BitsPerPixel / 8;
+			var paddingRequired = Bitmap.IsPaddingRequired( infoHeader.Width, infoHeader.BitsPerPixel,
+				bytesPerRow );
+			var pixelData = new byte[width * height * bytesPerPixel];
+			// seek to location where pixel data is
+			stream.Seek( fileHeader.PixelDataOffset, SeekOrigin.Begin );
+
+			if (paddingRequired) {
+				var bytesToCopy = width * bytesPerPixel;
+				for (var counter = 0; counter < height; counter++) {
+					var rowBuffer = bReader.ReadBytes( bytesPerRow );
+					Buffer.BlockCopy( src: rowBuffer, srcOffset: 0, dst: pixelData, dstOffset: counter * bytesToCopy, count: bytesToCopy );
 				}
+			} else {
+				var rowBuffer = bReader.ReadBytes( pixelData.Length );
+				rowBuffer.CopyTo( pixelData, 0 );
 			}
+
+			var bitmap = new Bitmap(
+				width, height,
+				pixelData: pixelData,
+				bitsPerPixel: infoHeader.BitsPerPixel
+			);
+			return bitmap;
 		}
 
 		public static void SaveBitmapToFile( string fileName, Bitmap bitmap ) {
