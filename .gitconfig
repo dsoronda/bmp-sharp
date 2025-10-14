@@ -1,0 +1,51 @@
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	required = true
+[user]
+	name = Dražen Šoronda
+	email = dsoronda@gmail.com
+
+[core]
+	editor = d:\\ide\\VSCode\\Code.exe
+
+#[merge]
+#	tool = vsdiffmerge
+#[diff]
+#	tool = vsdiffmerge
+
+#git config --global merge.tool p4merge
+[merge]
+	tool = p4merge
+[diff]
+	tool = vsdiffmerge
+
+[difftool "sourcetree"]
+	cmd = 'D:/progs/Perforce/p4merge.exe' \"$LOCAL\" \"$REMOTE\"
+[mergetool "sourcetree"]
+	cmd = 'D:/progs/Perforce/p4merge.exe' \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
+	trustExitCode = true
+
+[mergetool "p4merge"]
+	cmd = d:\\progs\\Perforce\\p4merge.exe \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
+
+[difftool]
+	prompt = true
+[difftool "vsdiffmerge"]
+	cmd = \"d:\\ide\\vs2017\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer\\vsdiffmerge.exe\" \"$LOCAL\" \"$REMOTE\" //t
+	keepBackup = false
+
+[mergetool]
+	prompt = true
+[mergetool "vsdiffmerge"]
+	cmd = \"d:\\ide\\vs2017\\Common7\\IDE\\CommonExtensions\\Microsoft\\TeamFoundation\\Team Explorer\\vsdiffmerge.exe\" \"$REMOTE\" \"$LOCAL\" \"$BASE\" \"$MERGED\" //m
+	keepBackup = false
+	trustExitCode = true
+
+#git config --global mergetoll.p4merge.cmd "'d:/progs/Perforce/p4merge.exe' $BASE $LOCAL $REMOTE $MERGED"
+[mergetoll "p4merge"]
+	cmd = 'd:/progs/Perforce/p4merge.exe' $BASE $LOCAL $REMOTE $MERGED
+
+
+[credential]
+   helper = wincred

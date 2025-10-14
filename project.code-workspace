@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/bin": true,
+			"**/obj": true,
+			"**/.idea": true,
+			"**/.vs": true,
+		},
+		"dotnet-test-explorer.runInParallel": true,
+		// "dotnet-test-explorer.testProjectPath": "**/*Test*.@(csproj)",
+		"dotnet-test-explorer.testProjectPath": "**/*Test*.@(csproj|fsproj)",
+		"dotnet-test-explorer.autoExpandTree": true,
+		"dotnet-test-explorer.autoWatch": true,
+		"dotnet-test-explorer.enableTelemetry": false,
+		//"dotnet-test-explorer.treeMode": "flat",
+		"coverage-gutters.showLineCoverage": true
+		// "dotnet-test-explorer.pathForResultFile": "/tmp/1"
+
+		//"dotnet-test-explorer.testProjectPath": "/home/shoky/work/bitbucket/perso/tests/Perso.Persistence.EF.SqliteIntegrationTests/Perso.Persistence.EF.SqliteIntegrationTests.csproj"
+		// "dotnet-test-explorer.testProjectPath": "**/*Test*.@(csproj|vbproj|fsproj)"
+	}
+	
+}

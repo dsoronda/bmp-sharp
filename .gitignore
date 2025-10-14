@@ -17,6 +17,7 @@
 [Rr]eleases/
 x64/
 x86/
+build/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -26,6 +27,9 @@ bld/
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
+
+# Jetbrains Rider cache/options directory
+.idea/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -39,11 +43,6 @@ TestResult.xml
 [Dd]ebugPS/
 [Rr]eleasePS/
 dlldata.c
-
-# DNX
-project.lock.json
-project.fragment.lock.json
-artifacts/
 
 *_i.c
 *_p.c
@@ -171,7 +170,10 @@ csx/
 ecf/
 rcf/
 
-# Windows Store app package directories and files
+# Microsoft Azure ApplicationInsights config file
+ApplicationInsights.config
+
+# Windows Store app package directory
 AppPackages/
 BundleArtifacts/
 Package.StoreAssociation.xml
@@ -249,10 +251,6 @@ paket-files/
 # FAKE - F# Make
 .fake/
 
-# JetBrains Rider
-.idea/
-*.sln.iml
-
 # CodeRush
 .cr/
 
@@ -264,7 +262,6 @@ __pycache__/
 *.min.js
 *.min.css
 
-_utils/
-
-# Node package lock
-package-lock.json
+/NDependOut
+/CleanArchitecture.ndproj
+/.mfractor
