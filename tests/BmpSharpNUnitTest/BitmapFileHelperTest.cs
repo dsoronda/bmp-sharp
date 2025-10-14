@@ -29,7 +29,6 @@ public class BitmapFileHelperTest {
 		bitmap.Height.ShouldBe( 2 );
 		bitmap.BytesPerPixel.ShouldBe(3);
 		bitmap.PixelData.Length .ShouldBe(10 * 2 * 3);
-
 		bitmap.BitsPerPixelEnum .ShouldBe(BitsPerPixelEnum.RGB24);
 	}
 
@@ -46,14 +45,16 @@ public class BitmapFileHelperTest {
 
 	[Test] public void RGBA_ReadFileAsBitmap_Success() {
 		var bitmap = BitmapFileHelper.ReadFileAsBitmap( RGBA_TestImageFullPath );
-		Assert.NotNull( bitmap );
+		bitmap.ShouldNotBeNull();
 
-		Assert.AreEqual( 10, bitmap.Width );
-		Assert.AreEqual( 2, bitmap.Height );
+		bitmap.Width.ShouldBe( 10);
+		bitmap.Height.ShouldBe( 2 );
+
 		const int bytesPerPixel = (int) BitsPerPixelEnum.RGBA32 / 8;
-		Assert.AreEqual( bytesPerPixel, bitmap.BytesPerPixel );
-		Assert.AreEqual( 10 * 2 * bytesPerPixel, bitmap.PixelData.Length );
-		Assert.AreEqual( BitsPerPixelEnum.RGBA32, bitmap.BitsPerPixelEnum );
+		bitmap.BytesPerPixel.ShouldBe( bytesPerPixel );
+
+		bitmap.PixelData.Length .ShouldBe(10 * 2 * bytesPerPixel);
+		bitmap.BitsPerPixelEnum .ShouldBe( BitsPerPixelEnum.RGBA32);
 	}
 
 	[Test] public void RGBA_WriteFileAsBitmap_Success() {
@@ -61,9 +62,9 @@ public class BitmapFileHelperTest {
 		var tempFolder = System.IO.Path.GetTempPath();
 		var targetFile = Path.Combine( tempFolder, RGBA_TestFileName );
 		BitmapFileHelper.SaveBitmapToFile( targetFile, bitmap );
+		File.Exists( targetFile ) .ShouldBeTrue();
 
-		Assert.IsTrue( File.Exists( targetFile ) );
 		var fileInfo = new FileInfo( targetFile );
-		Assert.AreEqual( bitmap.GetBmpBytes().Length, fileInfo.Length );
+		fileInfo.Length .ShouldBe( bitmap.GetBmpBytes().Length);
 	}
 }
