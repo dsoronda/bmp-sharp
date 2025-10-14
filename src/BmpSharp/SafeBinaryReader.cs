@@ -21,7 +21,7 @@ namespace BmpSharp {
 			return BitConverter.ToInt32( data, 0 );
 		}
 
-		public override uint ReadUInt32() => (uint) ReadUInt32();
+		public override uint ReadUInt32() => (uint) ReadInt32();
 
 		public override long ReadInt64() {
 			var data = base.ReadBytes( 8 );
