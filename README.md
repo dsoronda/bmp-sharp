@@ -56,7 +56,7 @@ System.IO.File.WriteAllBytes( $"{nameof( redGreenGradient )}.bmp", redGreenGradi
 
 Result:
 
-![Exported image](images\RGB24_RedGreenGradient.png)
+![Exported image](images/RGB24_RedGreenGradient.png)
 
 ## Out of scope
 
